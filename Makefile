@@ -1,6 +1,6 @@
 # Project settings
 CXX := g++
-EXEC := menu
+EXEC := main
 SRC_DIR := src
 INC_DIR := include
 OBJ_DIR := obj
@@ -11,7 +11,7 @@ OBJS := $(patsubst $(SRC_DIR)/%.cpp, $(OBJ_DIR)/%.o, $(SRCS))
 
 # Compiler flags
 CXXFLAGS := -Wall -std=c++17 -I$(INC_DIR)
-LDFLAGS := -lallegro -lallegro_font -lallegro_ttf -lallegro_primitives
+LDFLAGS := -lallegro -lallegro_font -lallegro_ttf -lallegro_primitives -lallegro_image
 
 # Default target
 all: $(EXEC)
