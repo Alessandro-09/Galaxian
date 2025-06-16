@@ -1,5 +1,6 @@
 #include "Init.hpp"
 #include "Menu.hpp"
+#include "Game.hpp"
 #include <iostream>
 
 #define SCREEN_WIDTH 800
@@ -23,10 +24,11 @@ int main() {
 
     // Maneja la opción seleccionada
     switch (option) {
-        case 0:
-            std::cout << "Iniciando el juego...\n";
-            // TODO: Lógica del juego aquí
+        case 0: {  // Start Game
+            Game game(sys.font, SCREEN_WIDTH, SCREEN_HEIGHT);
+            game.run(sys);
             break;
+        }
         case 1:
             std::cout << "Mostrando puntuaciones...\n";
             // TODO: Mostrar puntuaciones aquí

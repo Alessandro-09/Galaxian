@@ -1,77 +1,107 @@
 #include "Game.hpp"
-#include <allegro5/allegro_image.h>
-#include <cstdlib>
-#include <ctime>
-#include <allegro5/color.h>
+#include <allegro5/allegro_primitives.h>
+#include <cmath>
+#include <cstdlib> 
 
-#include <iostream>
+Game::Game(ALLEGRO_FONT* font, int width, int height) 
+    : font(font), width(width), height(height), 
+      starSpeed(1.0f), speedMultiplier(1.0f), elapsedTime(0.0f) {  // Velocidad inicial 1.0
+    generateStars();
+}
 
-
-struct Star {
-    float x, y;
-    float brightness;
-};
-
-const int NUM_STARS = 100;
-Star stars[NUM_STARS];
-
-void initStars(int width, int height) {
-    std::srand(static_cast<unsigned>(std::time(nullptr)));
-    for (int i = 0; i < NUM_STARS; ++i) {
-        stars[i].x = std::rand() % width;
-        stars[i].y = std::rand() % height;
-        stars[i].brightness = 0.5f + static_cast<float>(std::rand()) / RAND_MAX * 0.5f;
+void Game::generateStars() {
+    stars.clear();
+    for (int i = 0; i < 300; ++i) {
+        stars.emplace_back(
+            static_cast<float>(rand() % width),
+            static_cast<float>(rand() % height),
+            rand() % 3 // Tipo de estrella: 0=azul, 1=roja, 2=amarilla
+        );
     }
 }
 
-void drawStars() {
+void Game::update() {
+    // Aumentar el tiempo transcurrido 
+    elapsedTime += 1.0f/120.0f; 
+    
+    // AJUSTE DE VELOCIDAD (1): Velocidad inicial 1.0x, llega a 5x en 320 segundos
+    speedMultiplier = 1.0f + std::min(elapsedTime / 80.0f, 4.0f); // Máximo 5x de velocidad
+    
+    for (auto& star : stars) {
+        // AJUSTE DE VELOCIDAD (2): Velocidades base por tipo de estrella
+        float speedBase;
+        switch(star.type) {
+            case 0: speedBase = 0.5f; break;  // Estrellas azules lentas
+            case 1: speedBase = 1.0f; break;  // Estrellas rojas medias
+            case 2: speedBase = 1.5f; break;  // Estrellas amarillas rápidas
+        }
+        
+        star.y += speedBase * speedMultiplier;
+        
+        if (star.y > height) {
+            star.y = 0;
+            star.x = rand() % width;
+        }
+    }
+}
+
+void Game::draw() const {
+    al_clear_to_color(al_map_rgb(5, 2, 10)); // Fondo oscuro del espacio
+    float t = al_get_time(); // Tiempo actual para efectos de animación
+
     for (const auto& star : stars) {
-        ALLEGRO_COLOR color = al_map_rgb_f(star.brightness, star.brightness, star.brightness);
-        al_draw_pixel(star.x, star.y, color);
+        float twinkle = 0.6f + 0.4f * std::sin(t * 2 + star.x * 0.1f);  // Efecto de parpadeo
+        
+        if (star.type == 0) {
+            // Estrellas azules
+            al_draw_pixel(star.x, star.y, al_map_rgb(
+                50 + 50 * twinkle,
+                150 + 50 * twinkle,
+                200 + 55 * twinkle
+            ));
+        } else if (star.type == 1) {
+            // Estrellas rojas  
+            al_draw_pixel(star.x, star.y, al_map_rgb(
+                200 + 55 * twinkle,
+                50 + 50 * twinkle,
+                30 * twinkle
+            ));
+        } 
+        else {
+            // Estrellas amarillas
+            al_draw_pixel(star.x, star.y, al_map_rgb(
+                200 + 55 * twinkle,
+                180 + 75 * twinkle,
+                100 + 50 * twinkle
+            ));
+        }
     }
+
+    al_flip_display();
 }
 
-void runGame(SystemResources& sysRes) {
-    al_init_image_addon();
-
-    ALLEGRO_BITMAP* player = al_load_bitmap("assets/player.png");
-    if (!player) {
-        std::cerr << "Failed to load player image.\n";
-        return;
-    }
-
-    const float playerW = al_get_bitmap_width(player);
-    const float playerH = al_get_bitmap_height(player);
-    float playerX = (sysRes.width - playerW) / 2.0f;
-    float playerY = sysRes.height - playerH - 10;
-
-    initStars(sysRes.width, sysRes.height);
-
+int Game::run(SystemResources& sys) {
+    ALLEGRO_EVENT event;
     bool running = true;
-    bool redraw = true;
-    al_start_timer(sysRes.timer);
+
+    al_start_timer(sys.timer);
 
     while (running) {
-        ALLEGRO_EVENT event;
-        al_wait_for_event(sysRes.eventQueue, &event);
+        al_wait_for_event(sys.eventQueue, &event);
 
         if (event.type == ALLEGRO_EVENT_DISPLAY_CLOSE) {
-            running = false;
-        } else if (event.type == ALLEGRO_EVENT_TIMER) {
-            redraw = true;
-        } else if (event.type == ALLEGRO_EVENT_KEY_DOWN) {
-            if (event.keyboard.keycode == ALLEGRO_KEY_ESCAPE)
+            running = false; 
+        } 
+        else if (event.type == ALLEGRO_EVENT_KEY_DOWN) {
+            if (event.keyboard.keycode == ALLEGRO_KEY_ESCAPE) {
                 running = false;
-        }
-
-        if (redraw && al_is_event_queue_empty(sysRes.eventQueue)) {
-            al_clear_to_color(al_map_rgb(0, 0, 0));
-            drawStars();
-            al_draw_bitmap(player, playerX, playerY, 0);
-            al_flip_display();
-            redraw = false;
+            }
+        } 
+        else if (event.type == ALLEGRO_EVENT_TIMER) {
+            update();
+            draw();
         }
     }
 
-    al_destroy_bitmap(player);
+    return 0;
 }
