@@ -36,6 +36,17 @@ void Menu::generateStars() {
     }
 }
 
+void Menu::updateStars() {
+    for (auto& star : stars) {
+        star.second += 1.0f;  // velocidad constante hacia abajo
+
+        if (star.second > height) {
+            star.first = std::rand() % width;
+            star.second = 0;  // reaparece arriba
+        }
+    }
+}
+
 // Esta función procesa la entrada del teclado para moverse por el menú.
 // Si se presiona la flecha arriba o abajo, cambia la opción seleccionada.
 void Menu::processInput(ALLEGRO_EVENT& event) {
@@ -58,47 +69,77 @@ int Menu::getSelectedOption() const {
 
 // Esta función dibuja todo el menú en pantalla.
 void Menu::draw() const {
-    // Primero se limpia la pantalla con un color azul muy oscuro, simulando el espacio.
-    al_clear_to_color(al_map_rgb(0, 0, 20)); // Azul muy oscuro
+    // Fondo azul oscuro 
+    al_clear_to_color(al_map_rgb(3, 5, 15)); 
 
     float t = al_get_time();
 
-    // Se dibujan las estrellas de fondo, con un efecto de parpadeo usando una función seno.
+    // Estrellas
     for (const auto& star : stars) {
-        float brightness = 0.6f + 0.4f * std::sin(t * 4 + star.first);
-        int val = static_cast<int>(brightness * 255);
-        al_draw_pixel(star.first, star.second, al_map_rgb(val, val, val));
+        float twinkle = 0.7f + 0.3f * std::sin(t * 3 + star.first * 10);
+        if (static_cast<int>(star.first + star.second) % 3 == 0) {
+            // Estrellas azules
+            int blue = 150 + static_cast<int>(105 * twinkle);
+            al_draw_pixel(star.first, star.second, al_map_rgb(50, 100, blue));
+        } else {
+            // Estrellas blancas 
+            int val = 150 + static_cast<int>(105 * twinkle);
+            al_draw_pixel(star.first, star.second, al_map_rgb(val, val, val + 30));
+        }
     }
 
-    // Ahora se dibujan las opciones del menú.
+    // Opciones del menú con efecto
     for (size_t i = 0; i < options.size(); ++i) {
-        // Se calcula un valor de "pulso" para animar el color de la opción seleccionada.
-        float pulse = 0.7f + 0.3f * std::sin(t * 4 + i);
+        float pulse = 0.9f + 0.1f * std::sin(t * 1.5f + i);
 
-        // El color base es un azul claro (tipo "steel blue") que varía su brillo con el pulso.
-        ALLEGRO_COLOR baseColor = al_map_rgb_f(0.27f * pulse, 0.51f * pulse, 0.71f * pulse);
+        // Gradiente azul-cyan para opción seleccionada
+        ALLEGRO_COLOR selectedColor = al_map_rgb_f(
+            0.2f * pulse, 
+            0.5f * pulse, 
+            0.8f + 0.2f * pulse
+        );
+
+        // Color gris para opciones no seleccionadas 
+        ALLEGRO_COLOR normalColor = al_map_rgb(120, 150, 180);
 
         int x = width / 2;
         int y = 200 + static_cast<int>(i) * 60;
 
-        // Se dibuja una sombra o resplandor alrededor del texto para darle un efecto de brillo.
-        for (int dx = -2; dx <= 2; ++dx) {
-            for (int dy = -2; dy <= 2; ++dy) {
-                if (dx != 0 || dy != 0) {
-                    al_draw_text(font, al_map_rgba_f(0.27f, 0.51f, 0.71f, 0.15f),
-                                 x + dx, y + dy, ALLEGRO_ALIGN_CENTER, options[i].c_str());
-                }
+        // Efecto de resplandor
+        if (i == selectedOption) {
+            for (int glow = 1; glow <= 3; glow++) {
+                float alpha = 0.3f / glow;
+                al_draw_text(font, al_map_rgba_f(0.3f, 0.6f, 1.0f, alpha),
+                            x, y, ALLEGRO_ALIGN_CENTER, options[i].c_str());
             }
         }
 
-        // Si la opción está seleccionada, se usa el color animado; si no, un gris claro.
-        ALLEGRO_COLOR color = (i == selectedOption) ? baseColor : al_map_rgb(150, 150, 150);
+        // Sombra suave
+        al_draw_text(font, al_map_rgba_f(0.05f, 0.05f, 0.1f, 0.5f),
+                    x + 2, y + 2, ALLEGRO_ALIGN_CENTER, options[i].c_str());
 
-        // Finalmente, se dibuja el texto de la opción.
-        al_draw_text(font, color, x, y, ALLEGRO_ALIGN_CENTER, options[i].c_str());
+        // Texto principal
+        al_draw_text(font, (i == selectedOption) ? selectedColor : normalColor,
+                    x, y, ALLEGRO_ALIGN_CENTER, options[i].c_str());
+
+        // Pequeños indicadores para la opción seleccionada
+        if (i == selectedOption) {
+            float wingSize = 5.0f + 2.0f * std::sin(t * 3);
+            al_draw_filled_triangle(
+                x - 80, y + 10,
+                x - 60 - wingSize, y + 10,
+                x - 70, y + 10 - wingSize,
+                al_map_rgb(100, 180, 255)
+            );
+            al_draw_filled_triangle(
+                x + 80, y + 10,
+                x + 60 + wingSize, y + 10,
+                x + 70, y + 10 - wingSize,
+                al_map_rgb(100, 180, 255)
+            );
+        }
     }
 
-    // Se actualiza la pantalla para mostrar los cambios.
     al_flip_display();
 }
 
@@ -114,6 +155,7 @@ int Menu::run(SystemResources& sys) {
         al_wait_for_event(sys.eventQueue, &event);
 
         if (event.type == ALLEGRO_EVENT_TIMER) {
+            updateStars();
             draw();
         } else if (event.type == ALLEGRO_EVENT_DISPLAY_CLOSE) {
             selected = 2;  // Si se cierra la ventana, se selecciona "Exit".

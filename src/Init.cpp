@@ -29,7 +29,7 @@ SystemResources initializeSystem(int width, int height, const char* fontPath, in
 
     // Crea la cola de eventos y el temporizador para el bucle principal.
     sys.eventQueue = al_create_event_queue();
-    sys.timer = al_create_timer(1.0 / 60); // 60 FPS
+    sys.timer = al_create_timer(1.0 / 120); // 120 FPS
 
     // Si falla la creación de la cola de eventos o el temporizador, retorna recursos vacíos.
     if (!sys.eventQueue || !sys.timer) return sys;

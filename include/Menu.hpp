@@ -5,7 +5,7 @@
 #include <string>
 #include <allegro5/allegro.h>
 #include <allegro5/allegro_font.h>
-#include "Init.hpp"  // ✅ Esto es indispensable para que reconozca SystemResources
+#include "Init.hpp"  
 
 class Menu {
 public:
@@ -15,7 +15,7 @@ public:
     void processInput(ALLEGRO_EVENT& event);
     int getSelectedOption() const;
     void draw() const;
-    int run(SystemResources& sys);  // ahora se reconoce bien
+    int run(SystemResources& sys); 
 
 private:
     ALLEGRO_FONT* font;
@@ -23,9 +23,10 @@ private:
     int height;
     int selectedOption;
     std::vector<std::string> options;
-    std::vector<std::pair<int, int>> stars;
+    std::vector<std::pair<float, float>> stars;
 
     void generateStars();
+    void updateStars();
 };
 
 #endif

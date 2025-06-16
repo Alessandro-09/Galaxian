@@ -5,7 +5,7 @@
 #define SCREEN_WIDTH 800
 #define SCREEN_HEIGHT 600
 #define FONT_PATH "assets/space_font.ttf"
-#define FONT_SIZE 28
+#define FONT_SIZE 36
 
 int main() {
     // Inicializa Allegro y recursos del sistema
