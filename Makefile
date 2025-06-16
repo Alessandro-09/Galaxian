@@ -25,8 +25,12 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
 	@mkdir -p $(OBJ_DIR)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
+# Run the executable
+run: $(EXEC)
+	./$(EXEC)
+
 # Clean build artifacts
 clean:
 	rm -rf $(OBJ_DIR) $(EXEC)
 
-.PHONY: all clean
+.PHONY: all clean run
