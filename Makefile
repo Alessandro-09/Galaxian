@@ -1,12 +1,32 @@
-CXX = g++
-CXXFLAGS = -Wall -std=c++17 -Iinclude `pkg-config --cflags allegro-5 allegro_font-5 allegro_ttf-5`
-LDFLAGS = `pkg-config --libs allegro-5 allegro_font-5 allegro_ttf-5`
+# Project settings
+CXX := g++
+EXEC := menu
+SRC_DIR := src
+INC_DIR := include
+OBJ_DIR := obj
 
-SRC = src/main.cpp src/Menu.cpp
-OUT = menu
+# Find all source files and convert to object files
+SRCS := $(wildcard $(SRC_DIR)/*.cpp)
+OBJS := $(patsubst $(SRC_DIR)/%.cpp, $(OBJ_DIR)/%.o, $(SRCS))
 
-all:
-	$(CXX) $(SRC) -o $(OUT) $(CXXFLAGS) $(LDFLAGS)
+# Compiler flags
+CXXFLAGS := -Wall -std=c++17 -I$(INC_DIR)
+LDFLAGS := -lallegro -lallegro_font -lallegro_ttf -lallegro_primitives
 
+# Default target
+all: $(EXEC)
+
+# Link the executable
+$(EXEC): $(OBJS)
+	$(CXX) $^ -o $@ $(LDFLAGS)
+
+# Compile source files to object files
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
+	@mkdir -p $(OBJ_DIR)
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+
+# Clean build artifacts
 clean:
-	rm -f $(OUT)
+	rm -rf $(OBJ_DIR) $(EXEC)
+
+.PHONY: all clean
