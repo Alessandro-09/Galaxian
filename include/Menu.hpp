@@ -1,4 +1,3 @@
-// include/Menu.hpp
 #ifndef MENU_HPP
 #define MENU_HPP
 
@@ -6,6 +5,7 @@
 #include <string>
 #include <allegro5/allegro.h>
 #include <allegro5/allegro_font.h>
+#include "Init.hpp"  // ✅ Esto es indispensable para que reconozca SystemResources
 
 class Menu {
 public:
@@ -13,15 +13,19 @@ public:
     ~Menu();
 
     void processInput(ALLEGRO_EVENT& event);
-    void draw() const;
     int getSelectedOption() const;
+    void draw() const;
+    int run(SystemResources& sys);  // ahora se reconoce bien
 
 private:
-    std::vector<std::string> options;
-    int selectedOption;
     ALLEGRO_FONT* font;
     int width;
     int height;
+    int selectedOption;
+    std::vector<std::string> options;
+    std::vector<std::pair<int, int>> stars;
+
+    void generateStars();
 };
 
-#endif // MENU_HPP
+#endif
