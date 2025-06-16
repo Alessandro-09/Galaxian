@@ -2,7 +2,7 @@
 #include <allegro5/allegro.h>
 #include <allegro5/allegro_font.h>
 #include <allegro5/allegro_ttf.h>
-#include "menu.hpp"
+#include "Menu.hpp"
 
 const int WIDTH = 800;
 const int HEIGHT = 600;
@@ -25,7 +25,7 @@ int main() {
     al_register_event_source(eventQueue, al_get_display_event_source(display));
     al_register_event_source(eventQueue, al_get_keyboard_event_source());
 
-    menu menu(font, WIDTH, HEIGHT);
+    Menu menu(font, WIDTH, HEIGHT);
 
     bool running = true;
     bool enterPressed = false;
@@ -48,13 +48,10 @@ int main() {
 
         if (enterPressed) {
             int selected = menu.getSelectedOption();
-            // For now, just exit on selecting Exit or after any selection
-            if (selected == 2) { // Exit option index
+            if (selected == 2) { // opcion "Exit"
                 running = false;
             } else {
-                // Here you could switch states for other options
-                // For this simple example, just print selection and quit
-                // printf("Selected option %d\n", selected); // if you want debug output
+                // Aqui van las demas opciones del menu
                 running = false;
             }
         }

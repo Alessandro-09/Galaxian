@@ -7,10 +7,10 @@
 #include <allegro5/allegro.h>
 #include <allegro5/allegro_font.h>
 
-class menu {
+class Menu {
 public:
-    menu(ALLEGRO_FONT* font, int width, int height);
-    ~menu();
+    Menu(ALLEGRO_FONT* font, int width, int height);
+    ~Menu();
 
     void processInput(ALLEGRO_EVENT& event);
     void draw() const;

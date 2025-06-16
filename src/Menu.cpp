@@ -1,18 +1,17 @@
 // src/Menu.cpp
-#include "menu.hpp"
+#include "Menu.hpp"
 #include <allegro5/allegro_color.h>
 
-menu::menu(ALLEGRO_FONT* f, int w, int h)
+Menu::Menu(ALLEGRO_FONT* f, int w, int h)
     : font(f), width(w), height(h), selectedOption(0)
 {
     options = { "Start Game", "View High Scores", "Exit" };
 }
 
-menu::~menu() {
-    // font is managed externally; no deletion here
+Menu::~Menu() {
 }
 
-void menu::processInput(ALLEGRO_EVENT& event) {
+void Menu::processInput(ALLEGRO_EVENT& event) {
     if (event.type == ALLEGRO_EVENT_KEY_DOWN) {
         switch (event.keyboard.keycode) {
             case ALLEGRO_KEY_UP:
@@ -27,7 +26,7 @@ void menu::processInput(ALLEGRO_EVENT& event) {
     }
 }
 
-void menu::draw() const {
+void Menu::draw() const {
     al_clear_to_color(al_map_rgb(0, 0, 0));
 
     for (size_t i = 0; i < options.size(); ++i) {
@@ -38,6 +37,6 @@ void menu::draw() const {
     al_flip_display();
 }
 
-int menu::getSelectedOption() const {
+int Menu::getSelectedOption() const {
     return selectedOption;
 }
