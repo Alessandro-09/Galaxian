@@ -2,20 +2,44 @@
 #include <allegro5/allegro_primitives.h>
 #include <iostream>
 #include <cmath>
+#include <ctime>
+
 
 // El constructor recibe la fuente y el tamaño de la pantalla.
 // Inicializa los punteros de las imágenes a nulo y luego carga los recursos gráficos.
 InstructionsScreen::InstructionsScreen(ALLEGRO_FONT* font, int width, int height) 
     : font(font), width(width), height(height) {
+    std::srand(static_cast<unsigned int>(std::time(nullptr)));
     arrows_img = nullptr;
     space_img = nullptr;
     esc_img = nullptr;
     loadAssets();
+    generateStars();
 }
 
 // El destructor se asegura de liberar la memoria de las imágenes cargadas.
 InstructionsScreen::~InstructionsScreen() {
     destroyAssets();
+}
+
+// Esta función genera 100 estrellas en posiciones aleatorias para el fondo.
+void InstructionsScreen::generateStars() {
+    stars.clear();
+    const int starCount = 100;
+    for (int i = 0; i < starCount; ++i) {
+        stars.emplace_back(std::rand() % width, std::rand() % height);
+    }
+}
+
+void InstructionsScreen::updateStars() {
+    for (auto& star : stars) {
+        star.second += 1.0f;  // velocidad constante hacia abajo
+
+        if (star.second > height) {
+            star.first = std::rand() % width;
+            star.second = 0;  // reaparece arriba
+        }
+    }
 }
 
 // Esta función carga las imágenes de las teclas que se mostrarán en pantalla.
@@ -54,6 +78,7 @@ bool InstructionsScreen::run(SystemResources& sys) {
         } 
         else if (event.type == ALLEGRO_EVENT_TIMER) {
             loadingTime += 1.0f / 120.0f;
+            updateStars();
             if (loadingTime >= 2.0f) {
                 showEnterText = true;
                 // Efecto de pulsación suave (oscila entre 0.3 y 1.0 cada 2 segundos)
@@ -77,7 +102,23 @@ bool InstructionsScreen::run(SystemResources& sys) {
 // Esta función se encarga de dibujar toda la pantalla de instrucciones.
 void InstructionsScreen::draw() const {
     // Fondo azul oscuro 
-    al_clear_to_color(al_map_rgb(3, 5, 15));
+    al_clear_to_color(al_map_rgb(3, 5, 15)); 
+
+    float t = al_get_time();
+
+    // Estrellas
+    for (const auto& star : stars) {
+        float twinkle = 0.7f + 0.3f * std::sin(t * 3 + star.first * 10);
+        if (static_cast<int>(star.first + star.second) % 3 == 0) {
+            // Estrellas azules
+            int blue = 150 + static_cast<int>(105 * twinkle);
+            al_draw_pixel(star.first, star.second, al_map_rgb(50, 100, blue));
+        } else {
+            // Estrellas blancas 
+            int val = 150 + static_cast<int>(105 * twinkle);
+            al_draw_pixel(star.first, star.second, al_map_rgb(val, val, val + 30));
+        }
+    }
 
     // Constantes para posicionar los elementos en pantalla.
     const int TITLE_Y = 80;                   // Posición del título

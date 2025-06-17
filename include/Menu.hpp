@@ -21,7 +21,7 @@ private:
     ALLEGRO_FONT* font;
     int width;
     int height;
-    int selectedOption;
+    size_t selectedOption;
     std::vector<std::string> options;
     std::vector<std::pair<float, float>> stars;
 

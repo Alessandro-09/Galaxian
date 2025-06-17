@@ -150,6 +150,10 @@ int Menu::run(SystemResources& sys) {
     bool running = true;
     int selected = -1;
 
+    if (sys.music && !al_get_audio_stream_playing(sys.music)) {
+        al_set_audio_stream_playing(sys.music, true);
+    }
+
     while (running) {
         ALLEGRO_EVENT event;
         al_wait_for_event(sys.eventQueue, &event);

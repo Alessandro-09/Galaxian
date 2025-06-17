@@ -4,6 +4,8 @@
 #include <allegro5/allegro.h>
 #include <allegro5/allegro_font.h>
 #include <allegro5/allegro_image.h>
+#include <vector>
+#include <utility>
 #include "Init.hpp"
 
 class InstructionsScreen {
@@ -26,10 +28,15 @@ private:
     ALLEGRO_BITMAP* arrows_img;
     ALLEGRO_BITMAP* space_img;
     ALLEGRO_BITMAP* esc_img;
+
+    // Vector para almacenar las estrellas
+    std::vector<std::pair<float, float>> stars;
     
     // Declaración de los métodos privados
     void loadAssets();
     void destroyAssets();
+    void generateStars();
+    void updateStars();
 };
 
 #endif

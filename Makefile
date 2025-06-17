@@ -11,7 +11,7 @@ OBJS := $(patsubst $(SRC_DIR)/%.cpp, $(OBJ_DIR)/%.o, $(SRCS))
 
 # Compiler flags
 CXXFLAGS := -Wall -std=c++17 -I$(INC_DIR)
-LDFLAGS := -lallegro -lallegro_font -lallegro_ttf -lallegro_primitives -lallegro_image
+LDFLAGS := -lallegro -lallegro_font -lallegro_ttf -lallegro_primitives -lallegro_image -lallegro_audio -lallegro_acodec
 
 # Default target
 all: $(EXEC)

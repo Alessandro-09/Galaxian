@@ -1,53 +1,104 @@
 #include "Init.hpp"
+#include <allegro5/allegro_audio.h>
+#include <allegro5/allegro_acodec.h>
 #include <iostream>
 
-// Esta función se encarga de inicializar todos los recursos principales del sistema:
-// la ventana, la fuente, la cola de eventos y el temporizador.
-// Si algo falla en el proceso, devuelve un struct con punteros nulos.
 SystemResources initializeSystem(int width, int height, const char* fontPath, int fontSize) {
-    SystemResources sys = { nullptr, nullptr, nullptr, nullptr };
+    SystemResources sys = {nullptr, nullptr, nullptr, nullptr, nullptr, width, height};
 
-    // Inicializa Allegro. Si falla, muestra un mensaje y retorna recursos vacíos.
+    // 1. Inicialización básica de Allegro
     if (!al_init()) {
-        std::cerr << "Failed to initialize Allegro.\n";
+        std::cerr << "Error al inicializar Allegro." << std::endl;
         return sys;
     }
 
-    // Inicializa los módulos necesarios: teclado, fuentes, fuentes TTF y primitivas gráficas.
+    // 2. Inicializar addons esenciales
     al_install_keyboard();
     al_init_font_addon();
     al_init_ttf_addon();
     al_init_primitives_addon();
 
-    // Crea la ventana principal del juego.
+    // 3. Inicializar sistema de audio
+    if (!al_install_audio()) {
+        std::cerr << "Error al inicializar audio." << std::endl;
+        return sys;
+    }
+    if (!al_init_acodec_addon()) {
+        std::cerr << "Error al inicializar codecs de audio." << std::endl;
+        return sys;
+    }
+
+    // 3.1. Inicializar mixer de audio
+    if (!al_reserve_samples(1)) {
+        std::cerr << "Error al inicializar mixer de audio." << std::endl;
+        return sys;
+    }
+
+    // 4. Crear display
     sys.display = al_create_display(width, height);
-    if (!sys.display) return sys;
+    if (!sys.display) {
+        std::cerr << "Error al crear display." << std::endl;
+        return sys;
+    }
 
-    // Carga la fuente TTF que se usará en el juego.
+    // 5. Cargar fuente
     sys.font = al_load_ttf_font(fontPath, fontSize, 0);
-    if (!sys.font) return sys;
+    if (!sys.font) {
+        std::cerr << "Error cargando fuente: " << fontPath << std::endl;
+        cleanupSystem(sys);
+        return sys;
+    }
 
-    // Crea la cola de eventos y el temporizador para el bucle principal.
+    // 6. Configurar timer y event queue
+    sys.timer = al_create_timer(1.0 / 120.0); // 120 FPS
     sys.eventQueue = al_create_event_queue();
-    sys.timer = al_create_timer(1.0 / 120); // 120 FPS
+    if (!sys.timer || !sys.eventQueue) {
+        std::cerr << "Error al crear timer o event queue." << std::endl;
+        cleanupSystem(sys);
+        return sys;
+    }
 
-    // Si falla la creación de la cola de eventos o el temporizador, retorna recursos vacíos.
-    if (!sys.eventQueue || !sys.timer) return sys;
+    // 7. Cargar música 
+    sys.music = al_load_audio_stream("assets/space_music.ogg", 4, 2048);
+    if (!sys.music) {
+        std::cerr << "Advertencia: No se pudo cargar la música. Error: " << al_get_errno() << std::endl;
+    } else {
+        // Configuración segura del stream de audio
+        ALLEGRO_MIXER* mixer = al_get_default_mixer();
+        if (!mixer) {
+            al_destroy_audio_stream(sys.music);
+            sys.music = nullptr;
+        } else {
+            al_set_audio_stream_playmode(sys.music, ALLEGRO_PLAYMODE_LOOP);
+            if (!al_attach_audio_stream_to_mixer(sys.music, mixer)) {
+                al_destroy_audio_stream(sys.music);
+                sys.music = nullptr;
+            } else {
+                al_set_audio_stream_gain(sys.music, 0.5f); // Volumen al 50%
+            }
+        }
+    }
 
-    // Registra las fuentes de eventos: ventana, teclado y temporizador.
+    // 8. Registrar fuentes de eventos
     al_register_event_source(sys.eventQueue, al_get_display_event_source(sys.display));
     al_register_event_source(sys.eventQueue, al_get_keyboard_event_source());
     al_register_event_source(sys.eventQueue, al_get_timer_event_source(sys.timer));
 
-    // Si todo salió bien, retorna los recursos inicializados.
     return sys;
 }
 
-// Esta función libera todos los recursos del sistema para evitar fugas de memoria.
-// Destruye la fuente, el temporizador, la cola de eventos y la ventana, si existen.
 void cleanupSystem(SystemResources& sys) {
+    // Liberar recursos 
+    if (sys.music) {
+        al_set_audio_stream_playing(sys.music, false);
+        al_detach_audio_stream(sys.music);
+        al_destroy_audio_stream(sys.music);
+    }
     if (sys.font) al_destroy_font(sys.font);
     if (sys.timer) al_destroy_timer(sys.timer);
     if (sys.eventQueue) al_destroy_event_queue(sys.eventQueue);
     if (sys.display) al_destroy_display(sys.display);
+    
+    // Cierre seguro del sistema de audio
+    al_uninstall_audio();
 }
