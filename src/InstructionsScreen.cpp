@@ -125,18 +125,18 @@ void InstructionsScreen::draw() const {
     const int CONTROLS_Y = 250;               // Posición de los nombres de controles
     const int KEY_Y = CONTROLS_Y + 50;        // Posición de las imágenes de teclas
     const int KEY_IMG_HEIGHT = 90;            // Altura estándar para las imágenes
-    //const int LOADING_Y = 520;                // Posición del mensaje de carga
+    //const int LOADING_Y = 520;              // Posición del mensaje de carga
     const int COL1_X = 200;                   // Columna 1 (moverse)
     const int COL2_X = 400;                   // Columna 2 (disparar)
     const int COL3_X = 600;                   // Columna 3 (salir)
 
     // Dibuja el título de la pantalla de instrucciones con un color azul claro.
-    al_draw_text(font, al_map_rgb(100, 180, 255), COL2_X, TITLE_Y, ALLEGRO_ALIGN_CENTER, "INSTRUCCIONES");
+    al_draw_text(font, al_map_rgb(100, 180, 255), COL2_X, TITLE_Y, ALLEGRO_ALIGN_CENTER, "INSTRUCTIONS");
 
     // Dibuja los nombres de los controles, cada uno con un color diferente para distinguirlos.
-    al_draw_text(font, al_map_rgb(255, 255, 255), COL1_X, CONTROLS_Y, ALLEGRO_ALIGN_CENTER, "MOVERTE");
-    al_draw_text(font, al_map_rgb(255, 200, 100), COL2_X, CONTROLS_Y, ALLEGRO_ALIGN_CENTER, "DISPARAR");
-    al_draw_text(font, al_map_rgb(255, 100, 100), COL3_X, CONTROLS_Y, ALLEGRO_ALIGN_CENTER, "SALIR");
+    al_draw_text(font, al_map_rgb(255, 255, 255), COL1_X, CONTROLS_Y, ALLEGRO_ALIGN_CENTER, "MOVE");
+    al_draw_text(font, al_map_rgb(255, 200, 100), COL2_X, CONTROLS_Y, ALLEGRO_ALIGN_CENTER, "SHOOT");
+    al_draw_text(font, al_map_rgb(255, 100, 100), COL3_X, CONTROLS_Y, ALLEGRO_ALIGN_CENTER, "EXIT");
 
     // Dibuja las imágenes de las teclas, escaladas para que todas tengan la misma altura.
     if (arrows_img) {
@@ -161,8 +161,8 @@ void InstructionsScreen::draw() const {
     }
 
     const char* message = showEnterText ? 
-        "PRESIONA ENTER PARA JUGAR" : 
-        "CARGANDO...";
+        "PRESS ENTER TO PLAY" : 
+        "LOADING...";
     
     if (showEnterText) {
         pulseIntensity = 0.05f + 0.95f * pow(sin(al_get_time() * 2.0f), 4.0f);  // PARPADEO
