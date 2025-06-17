@@ -1,6 +1,9 @@
 #include "Init.hpp"
 #include "Menu.hpp"
 #include "Game.hpp"
+#include "InstructionsScreen.hpp"
+#include <allegro5/allegro_image.h> 
+
 #include <iostream>
 
 #define SCREEN_WIDTH 800
@@ -10,6 +13,12 @@
 
 int main() {
     // Inicializa Allegro y recursos del sistema
+
+    if (!al_init_image_addon()) { // Añade esta línea
+        std::cerr << "Failed to initialize image addon!\n";
+        return -1;
+    }
+    
     SystemResources sys = initializeSystem(SCREEN_WIDTH, SCREEN_HEIGHT, FONT_PATH, FONT_SIZE);
 
     if (!sys.display || !sys.font || !sys.eventQueue || !sys.timer) {
@@ -25,8 +34,11 @@ int main() {
     // Maneja la opción seleccionada
     switch (option) {
         case 0: {  // Start Game
-            Game game(sys.font, SCREEN_WIDTH, SCREEN_HEIGHT);
-            game.run(sys);
+            InstructionsScreen instructions(sys.font, SCREEN_WIDTH, SCREEN_HEIGHT);
+            if (instructions.run(sys)) { // Solo entra al juego si presiona ENTER
+                Game game(sys.font, SCREEN_WIDTH, SCREEN_HEIGHT);
+                game.run(sys);
+            }
             break;
         }
         case 1:

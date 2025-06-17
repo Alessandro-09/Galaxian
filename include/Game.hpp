@@ -7,9 +7,8 @@
 struct Star {
     float x;
     float y;
-    int type;  // 0=azul, 1=roja, 2=amarilla
+    int type;  
     
-    // Añade este constructor
     Star(float x, float y, int type) : x(x), y(y), type(type) {}
 };
 
@@ -27,7 +26,7 @@ private:
     void generateStars();
     void update();
     float starSpeed;
-    float speedMultiplier; // Nuevo: factor de aumento de velocidad
+    float speedMultiplier; 
     float elapsedTime;  
 };
 
