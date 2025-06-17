@@ -131,7 +131,7 @@ void InstructionsScreen::draw() const {
     const int COL3_X = 600;                   // Columna 3 (salir)
 
     // Dibuja el título de la pantalla de instrucciones con un color azul claro.
-    al_draw_text(font, al_map_rgb(100, 180, 255), COL2_X, TITLE_Y, ALLEGRO_ALIGN_CENTER, "INSTRUCTIONS");
+    al_draw_text(font, al_map_rgb(100, 180, 255), COL2_X, TITLE_Y, ALLEGRO_ALIGN_CENTER, "HOW TO PLAY?");
 
     // Dibuja los nombres de los controles, cada uno con un color diferente para distinguirlos.
     al_draw_text(font, al_map_rgb(255, 255, 255), COL1_X, CONTROLS_Y, ALLEGRO_ALIGN_CENTER, "MOVE");
