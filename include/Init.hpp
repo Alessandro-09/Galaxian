@@ -14,7 +14,9 @@ struct SystemResources {
     ALLEGRO_EVENT_QUEUE* eventQueue;
     ALLEGRO_TIMER* timer;
     ALLEGRO_AUDIO_STREAM* menuMusic;       // Música para el menú principal
-    ALLEGRO_AUDIO_STREAM* instructionsMusic; // Música para la pantalla de instrucciones       
+    ALLEGRO_AUDIO_STREAM* instructionsMusic; // Música para la pantalla de instrucciones 
+    ALLEGRO_SAMPLE* shootSound;          // Sonido de disparo
+    ALLEGRO_SAMPLE* hitEnemySound;       // Sonido de golpe a enemigo      
     
     int width;
     int height;

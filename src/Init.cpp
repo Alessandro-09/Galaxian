@@ -4,7 +4,7 @@
 #include <iostream>
 
 SystemResources initializeSystem(int width, int height, const char* fontPath, int fontSize) {
-    SystemResources sys = {nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, width, height};
+    SystemResources sys = {nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, width, height};
 
     // 1. Inicialización básica de Allegro
     if (!al_init()) {
@@ -61,6 +61,8 @@ SystemResources initializeSystem(int width, int height, const char* fontPath, in
     // 7. Cargar músicas
     sys.menuMusic = al_load_audio_stream("assets/space_music.ogg", 4, 2048);
     sys.instructionsMusic = al_load_audio_stream("assets/instructions_music.ogg", 4, 2048);
+    sys.shootSound = al_load_sample("assets/shoot.ogg");
+    sys.hitEnemySound = al_load_sample("assets/hit_enemy.ogg");
 
     if (!sys.menuMusic) {
         std::cerr << "Advertencia: No se pudo cargar la música del menú." << std::endl;
@@ -80,6 +82,14 @@ SystemResources initializeSystem(int width, int height, const char* fontPath, in
             al_destroy_audio_stream(sys.instructionsMusic);
             sys.instructionsMusic = nullptr;
         }
+    }
+
+    if (!sys.shootSound) {
+        std::cerr << "Error al cargar shoot.ogg" << std::endl;
+    }
+
+    if (!sys.hitEnemySound) {
+        std::cerr << "Error al cargar hit_enemy.ogg" << std::endl;
     }
 
     // 8. Registrar fuentes de eventos
