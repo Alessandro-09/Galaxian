@@ -39,10 +39,10 @@ int main() {
     }
 
     // Configura música
-    if (sys.music) {
-        al_set_audio_stream_playmode(sys.music, ALLEGRO_PLAYMODE_LOOP);
-        al_set_audio_stream_gain(sys.music, 0.6f);  // 60% volumen
-        al_set_audio_stream_playing(sys.music, true);
+    if (sys.menuMusic) {
+        al_set_audio_stream_playmode(sys.menuMusic, ALLEGRO_PLAYMODE_LOOP);
+        al_set_audio_stream_gain(sys.menuMusic, 0.6f);  // 60% volumen
+        al_set_audio_stream_playing(sys.menuMusic, true);
     }
 
     // === BUCLE PRINCIPAL ===
@@ -55,12 +55,15 @@ int main() {
             case 0: {  // Start Game
                 InstructionsScreen instructions(sys.font, SCREEN_WIDTH, SCREEN_HEIGHT);
                 if (instructions.run(sys)) {
-                    if (sys.music) al_set_audio_stream_gain(sys.music, 0.3f);  // Baja volumen en juego
+                    // Detener todas las músicas antes de entrar al juego
+                    if (sys.menuMusic) al_set_audio_stream_playing(sys.menuMusic, false);
+                    if (sys.instructionsMusic) al_set_audio_stream_playing(sys.instructionsMusic, false);
                     
                     Game game(sys.font, SCREEN_WIDTH, SCREEN_HEIGHT);
                     game.run(sys);
                     
-                    if (sys.music) al_set_audio_stream_gain(sys.music, 0.6f);  // Restaura volumen
+                    // Reanudar solo la música del menú al volver
+                    if (sys.menuMusic) al_set_audio_stream_playing(sys.menuMusic, true);
                 }
                 break;
             }

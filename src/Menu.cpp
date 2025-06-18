@@ -150,8 +150,13 @@ int Menu::run(SystemResources& sys) {
     bool running = true;
     int selected = -1;
 
-    if (sys.music && !al_get_audio_stream_playing(sys.music)) {
-        al_set_audio_stream_playing(sys.music, true);
+    if (sys.menuMusic && !al_get_audio_stream_playing(sys.menuMusic)) {
+        al_set_audio_stream_playing(sys.menuMusic, true);
+    }
+
+    // Detener la música de instrucciones si está sonando
+    if (sys.instructionsMusic && al_get_audio_stream_playing(sys.instructionsMusic)) {
+        al_set_audio_stream_playing(sys.instructionsMusic, false);
     }
 
     while (running) {

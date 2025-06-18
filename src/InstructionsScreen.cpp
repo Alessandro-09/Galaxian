@@ -69,6 +69,16 @@ bool InstructionsScreen::run(SystemResources& sys) {
     bool startGame = false;
     loadingTime = 0.0f;
 
+    // Detener la música del menú si está sonando
+    if (sys.menuMusic && al_get_audio_stream_playing(sys.menuMusic)) {
+        al_set_audio_stream_playing(sys.menuMusic, false);
+    }
+
+    // Iniciar la música de instrucciones
+    if (sys.instructionsMusic && !al_get_audio_stream_playing(sys.instructionsMusic)) {
+        al_set_audio_stream_playing(sys.instructionsMusic, true);
+    }
+
     while (running) {
         ALLEGRO_EVENT event;
         al_wait_for_event(sys.eventQueue, &event);
@@ -77,7 +87,7 @@ bool InstructionsScreen::run(SystemResources& sys) {
             running = false;
         } 
         else if (event.type == ALLEGRO_EVENT_TIMER) {
-            loadingTime += 1.0f / 120.0f;
+            loadingTime += 1.0f / 120.0f; //
             updateStars();
             if (loadingTime >= 2.0f) {
                 showEnterText = true;

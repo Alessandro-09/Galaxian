@@ -4,7 +4,7 @@
 #include <iostream>
 
 SystemResources initializeSystem(int width, int height, const char* fontPath, int fontSize) {
-    SystemResources sys = {nullptr, nullptr, nullptr, nullptr, nullptr, width, height};
+    SystemResources sys = {nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, width, height};
 
     // 1. Inicialización básica de Allegro
     if (!al_init()) {
@@ -58,24 +58,27 @@ SystemResources initializeSystem(int width, int height, const char* fontPath, in
         return sys;
     }
 
-    // 7. Cargar música 
-    sys.music = al_load_audio_stream("assets/space_music.ogg", 4, 2048);
-    if (!sys.music) {
-        std::cerr << "Advertencia: No se pudo cargar la música. Error: " << al_get_errno() << std::endl;
+    // 7. Cargar músicas
+    sys.menuMusic = al_load_audio_stream("assets/space_music.ogg", 4, 2048);
+    sys.instructionsMusic = al_load_audio_stream("assets/instructions_music.ogg", 4, 2048);
+
+    if (!sys.menuMusic) {
+        std::cerr << "Advertencia: No se pudo cargar la música del menú." << std::endl;
     } else {
-        // Configuración segura del stream de audio
-        ALLEGRO_MIXER* mixer = al_get_default_mixer();
-        if (!mixer) {
-            al_destroy_audio_stream(sys.music);
-            sys.music = nullptr;
-        } else {
-            al_set_audio_stream_playmode(sys.music, ALLEGRO_PLAYMODE_LOOP);
-            if (!al_attach_audio_stream_to_mixer(sys.music, mixer)) {
-                al_destroy_audio_stream(sys.music);
-                sys.music = nullptr;
-            } else {
-                al_set_audio_stream_gain(sys.music, 0.5f); // Volumen al 50%
-            }
+        al_set_audio_stream_playmode(sys.menuMusic, ALLEGRO_PLAYMODE_LOOP);
+        if (!al_attach_audio_stream_to_mixer(sys.menuMusic, al_get_default_mixer())) {
+            al_destroy_audio_stream(sys.menuMusic);
+            sys.menuMusic = nullptr;
+        }
+    }
+
+    if (!sys.instructionsMusic) {
+        std::cerr << "Advertencia: No se pudo cargar la música de instrucciones." << std::endl;
+    } else {
+        al_set_audio_stream_playmode(sys.instructionsMusic, ALLEGRO_PLAYMODE_LOOP);
+        if (!al_attach_audio_stream_to_mixer(sys.instructionsMusic, al_get_default_mixer())) {
+            al_destroy_audio_stream(sys.instructionsMusic);
+            sys.instructionsMusic = nullptr;
         }
     }
 
@@ -89,10 +92,15 @@ SystemResources initializeSystem(int width, int height, const char* fontPath, in
 
 void cleanupSystem(SystemResources& sys) {
     // Liberar recursos 
-    if (sys.music) {
-        al_set_audio_stream_playing(sys.music, false);
-        al_detach_audio_stream(sys.music);
-        al_destroy_audio_stream(sys.music);
+    if (sys.menuMusic) {
+        al_set_audio_stream_playing(sys.menuMusic, false);
+        al_detach_audio_stream(sys.menuMusic);
+        al_destroy_audio_stream(sys.menuMusic);
+    }
+    if (sys.instructionsMusic) {
+        al_set_audio_stream_playing(sys.instructionsMusic, false);
+        al_detach_audio_stream(sys.instructionsMusic);
+        al_destroy_audio_stream(sys.instructionsMusic);
     }
     if (sys.font) al_destroy_font(sys.font);
     if (sys.timer) al_destroy_timer(sys.timer);

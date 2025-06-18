@@ -13,7 +13,8 @@ struct SystemResources {
     ALLEGRO_FONT* font;
     ALLEGRO_EVENT_QUEUE* eventQueue;
     ALLEGRO_TIMER* timer;
-    ALLEGRO_AUDIO_STREAM* music;       
+    ALLEGRO_AUDIO_STREAM* menuMusic;       // Música para el menú principal
+    ALLEGRO_AUDIO_STREAM* instructionsMusic; // Música para la pantalla de instrucciones       
     
     int width;
     int height;

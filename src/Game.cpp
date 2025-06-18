@@ -22,7 +22,7 @@ void Game::generateStars() {
 
 void Game::update() {
     // Aumentar el tiempo transcurrido 
-    elapsedTime += 1.0f/120.0f; 
+    elapsedTime += 1.0f/120.0f; // 120 FPS
     
     // AJUSTE DE VELOCIDAD (1): Velocidad inicial 1.0x, llega a 5x en 320 segundos
     speedMultiplier = 1.0f + std::min(elapsedTime / 80.0f, 4.0f); // Máximo 5x de velocidad
@@ -83,6 +83,14 @@ void Game::draw() const {
 int Game::run(SystemResources& sys) {
     ALLEGRO_EVENT event;
     bool running = true;
+
+    // Detener cualquier música que esté sonando al entrar al juego
+    if (sys.menuMusic && al_get_audio_stream_playing(sys.menuMusic)) {
+        al_set_audio_stream_playing(sys.menuMusic, false);
+    }
+    if (sys.instructionsMusic && al_get_audio_stream_playing(sys.instructionsMusic)) {
+        al_set_audio_stream_playing(sys.instructionsMusic, false);
+    }
 
     al_start_timer(sys.timer);
 
