@@ -314,6 +314,17 @@ void Game::actualizarenemigos()
         enemigo = enemigo->Siguiente;
     }
 }
+void limpiarenemigos()
+{
+    ptr_est aux = enemigos;
+    while (aux != nullptr)
+    {
+        ptr_est temp = aux;
+        aux = aux->Siguiente;
+        delete temp;
+    }
+    enemigos = nullptr; // Importante para evitar punteros colgantes
+}
 bool puedeAtacar(ptr_est e) {
     ptr_est aux = enemigos;
     int contador=0;
@@ -553,11 +564,13 @@ int Game::run(SystemResources& sys) {
             }
     	}
         if (event.type == ALLEGRO_EVENT_DISPLAY_CLOSE) {
-            running = false; 
+            running = false;
+            limpiarenemigos();
         } 
         else if (event.type == ALLEGRO_EVENT_KEY_DOWN) {
             if (event.keyboard.keycode == ALLEGRO_KEY_ESCAPE) {
                 running = false;
+                limpiarenemigos();
             }
         } 
         
