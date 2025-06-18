@@ -46,7 +46,8 @@ typedef struct navesenemigas//se crea una estructura para los enemigos
     float dx, dy;          //se crea atributos para la velocidad
     int ataque;            //se crea atributo para el ataque entre 1 y 0
     int estado;            //se crea atributo para el estado de movimiento con codigos 0,1,2,3,100,101,102 hay que agregar más estados usen codigos 
-
+    int Disparo;
+    double Tiempo;
    navesenemigas* Siguiente; 
 }*ptr_est;
 
@@ -113,55 +114,228 @@ void Game::crearnivel() //para creación de nivel
     int x=190;                                  //se establece un x fijo para acomodar las naves
     int y=40;                                   //se crea el y para el comienzo
     int col =10;                                //se crea la cantidad de columnas
-	for (int fila = 0; fila < 5; fila++)        //por 5 filas
-	{
-        const char* ruta;                       //constante de tipo caracter para la ruta de laimagen ya que el al_load_bitmap solo acepta este datdo
-        if( fila==0)
+    const char* ruta1="pictures/navenemiga1.png";
+    const char* ruta2="pictures/navenemiga2.png";
+    const char* ruta3="pictures/navenemiga3.png";
+    const char* ruta4="pictures/navenemiga4.png";
+    const char* ruta;
+    switch (nivel)
+    {
+    case 1:
+        for (int fila = 0; fila < 5; fila++)        //por 5 filas
         {
-            ruta="pictures/navenemiga1.png";    //se carga la primera nave estas son las amarillas de arriba
-            x=250;                              // desde 250 para hacer ver la mitad
-            col=7;                              //se establece la cantidad que se va a dibujar
-        }
-        else if( fila==1)                       //si  es fila 1 en otras la 2 para nosostros
-        {
-            ruta="pictures/navenemiga2.png";    //se carga la primera nave estas son las rojas
-            x=200;
-            col=9;                              //se establece la cantidad que se va a dibujar
-        }
-         else if( fila==2)
-         {
-            ruta="pictures/navenemiga4.png";    //se carga la primera nave estas son las moradas
-            col=11;                             //se establece la cantidad que se va a dibujar
-        }
-         else
-         {
-            ruta="pictures/navenemiga3.png";
-         }
-		for (int i = 0; i < col; i++)           //cantidad naves 
-		{
+            switch (fila)
+            {
+            case 0:
+                ruta=ruta1;
+                col=1;
+                x=250;
+                break;
+           case 1:
+           {
+                ruta=ruta2;
+                col=2;
+                x=225;
+                break;
+            }
+            case 2:
+                ruta=ruta3;
+                col=4;
+                x=200;
+                break;
+            default:
+                ruta=ruta4;
+                break;
+             }
+             for (int i = 0; i < col; i++)           //cantidad naves 
+            {
 
-            nuevo= new navesenemigas();         // se ccea nuevo elemento de navesenemigas
-            nuevo->bitmap=al_load_bitmap(ruta); //se carga la imagen
-            nuevo->alto= al_get_bitmap_height(nuevo->bitmap); //se carga su alto y ancho segun la imagen
-            nuevo->ancho=al_get_bitmap_width(nuevo->bitmap);
-            nuevo->x=x;                         //se pasa el x de dibujo
-            nuevo->y=y;                         //se pasas el y
-            nuevo->origenx=x;                   //se pasa para guadar posición de origen 
-            nuevo->origeny=y;                   //se para guardar posición de origen y
-            nuevo->col=i+11-col;                // se calcula su colomna
-            nuevo->fila=fila;                   //se pasa su fila 
-            nuevo->dx = 1;                      //se le da una velocidad lateral
-            nuevo->dy = 0;                      //se pone y en 0
-            nuevo->ataque=0;                    //se le pone estado de no ataque
-            nuevo->estado=0;                    //se pone estadode no movimiento
-            nuevo->Siguiente=nullptr;
-            agregaralfinal(enemigos, nuevo);    //se pasa par agregar a la lista
-            x+=40;
-         }
-         y+=60;
-         x=170;
+                nuevo= new navesenemigas();         // se ccea nuevo elemento de navesenemigas
+                nuevo->bitmap=al_load_bitmap(ruta); //se carga la imagen
+                nuevo->alto= al_get_bitmap_height(nuevo->bitmap); //se carga su alto y ancho segun la imagen
+                nuevo->ancho=al_get_bitmap_width(nuevo->bitmap);
+                nuevo->x=x;                         //se pasa el x de dibujo
+                nuevo->y=y;                         //se pasas el y
+                nuevo->origenx=x;                   //se pasa para guadar posición de origen 
+                nuevo->origeny=y;                   //se para guardar posición de origen y
+                nuevo->col=i+4-col;                // se calcula su colomna
+                nuevo->fila=fila;                   //se pasa su fila 
+                nuevo->dx = 1;                      //se le da una velocidad lateral
+                nuevo->dy = 0;                      //se pone y en 0
+                nuevo->ataque=0;                    //se le pone estado de no ataque
+                nuevo->estado=0;                    //se pone estadode no movimiento
+                nuevo->Siguiente=nullptr;
+                nuevo->Disparo=1;
+                nuevo->Tiempo=0;
+                agregaralfinal(enemigos, nuevo);    //se pasa par agregar a la lista
+                x+=40;
+            }
+            y+=60;
+            x=200;
+        }
+        break;
+    case 2:
+        for (int fila = 0; fila < 5; fila++)        //por 5 filas
+        {
+            switch (fila)
+            {
+            case 0:
+                ruta=ruta1;
+                col=2;
+                x=250;
+                break;
+           case 1:
+           {
+                ruta=ruta2;
+                col=3;
+                x=225;
+                break;
+            }
+            case 2:
+                ruta=ruta3;
+                col=5;
+                x=200;
+                break;
+            default:
+                ruta=ruta4;
+                break;
+             }
+             for (int i = 0; i < col; i++)           //cantidad naves 
+            {
+
+                nuevo= new navesenemigas();         // se ccea nuevo elemento de navesenemigas
+                nuevo->bitmap=al_load_bitmap(ruta); //se carga la imagen
+                nuevo->alto= al_get_bitmap_height(nuevo->bitmap); //se carga su alto y ancho segun la imagen
+                nuevo->ancho=al_get_bitmap_width(nuevo->bitmap);
+                nuevo->x=x;                         //se pasa el x de dibujo
+                nuevo->y=y;                         //se pasas el y
+                nuevo->origenx=x;                   //se pasa para guadar posición de origen 
+                nuevo->origeny=y;                   //se para guardar posición de origen y
+                nuevo->col=i+5-col;                // se calcula su colomna
+                nuevo->fila=fila;                   //se pasa su fila 
+                nuevo->dx = 1.25;                      //se le da una velocidad lateral
+                nuevo->dy = 0;                      //se pone y en 0
+                nuevo->ataque=0;                    //se le pone estado de no ataque
+                nuevo->estado=0;                    //se pone estadode no movimiento
+                nuevo->Siguiente=nullptr;
+                nuevo->Disparo=1;
+                nuevo->Tiempo=0;
+                agregaralfinal(enemigos, nuevo);    //se pasa par agregar a la lista
+                x+=40;
+            }
+            y+=60;
+            x=200;
+        }
+        break;
+    case 3:
+        for (int fila = 0; fila < 5; fila++)        //por 5 filas
+        {
+            switch (fila)
+            {
+            case 0:
+                ruta=ruta1;
+                col=3;
+                x=250;
+                break;
+           case 1:
+           {
+                ruta=ruta2;
+                col=5;
+                x=225;
+                break;
+            }
+            case 2:
+                ruta=ruta3;
+                col=7;
+                x=200;
+                break;
+            default:
+                ruta=ruta4;
+                break;
+             }
+             for (int i = 0; i < col; i++)           //cantidad naves 
+            {
+
+                nuevo= new navesenemigas();         // se ccea nuevo elemento de navesenemigas
+                nuevo->bitmap=al_load_bitmap(ruta); //se carga la imagen
+                nuevo->alto= al_get_bitmap_height(nuevo->bitmap); //se carga su alto y ancho segun la imagen
+                nuevo->ancho=al_get_bitmap_width(nuevo->bitmap);
+                nuevo->x=x;                         //se pasa el x de dibujo
+                nuevo->y=y;                         //se pasas el y
+                nuevo->origenx=x;                   //se pasa para guadar posición de origen 
+                nuevo->origeny=y;                   //se para guardar posición de origen y
+                nuevo->col=i+7-col;                // se calcula su colomna
+                nuevo->fila=fila;                   //se pasa su fila 
+                nuevo->dx = 1.5;                      //se le da una velocidad lateral
+                nuevo->dy = 0;                      //se pone y en 0
+                nuevo->ataque=0;                    //se le pone estado de no ataque
+                nuevo->estado=0;                    //se pone estadode no movimiento
+                nuevo->Siguiente=nullptr;
+                nuevo->Disparo=1;
+                nuevo->Tiempo=0;
+                agregaralfinal(enemigos, nuevo);    //se pasa par agregar a la lista
+                x+=40;
+            }
+            y+=60;
+            x=200;
+        }
+        break;
+    default:
+        for (int fila = 0; fila < 5; fila++)        //por 5 filas
+        {
+            switch (fila)
+            {
+            case 0:
+                ruta=ruta1;
+                col=4;
+                x=250;
+                break;
+           case 1:
+           {
+                ruta=ruta2;
+                col=6;
+                x=225;
+                break;
+            }
+            case 2:
+                ruta=ruta3;
+                col=8;
+                x=200;
+                break;
+            default:
+                ruta=ruta4;
+                break;
+             }
+            for (int i = 0; i < col; i++)           //cantidad naves 
+            {
+
+                nuevo= new navesenemigas();         // se ccea nuevo elemento de navesenemigas
+                nuevo->bitmap=al_load_bitmap(ruta); //se carga la imagen
+                nuevo->alto= al_get_bitmap_height(nuevo->bitmap); //se carga su alto y ancho segun la imagen
+                nuevo->ancho=al_get_bitmap_width(nuevo->bitmap);
+                nuevo->x=x;                         //se pasa el x de dibujo
+                nuevo->y=y;                         //se pasas el y
+                nuevo->origenx=x;                   //se pasa para guadar posición de origen 
+                nuevo->origeny=y;                   //se para guardar posición de origen y
+                nuevo->col=i+8-col;                // se calcula su colomna
+                nuevo->fila=fila;                   //se pasa su fila 
+                nuevo->dx = 2;                      //se le da una velocidad lateral
+                nuevo->dy = 0;                      //se pone y en 0
+                nuevo->ataque=0;                    //se le pone estado de no ataque
+                nuevo->estado=0;                    //se pone estadode no movimiento
+                nuevo->Siguiente=nullptr;
+                nuevo->Disparo=1;
+                nuevo->Tiempo=0;
+                agregaralfinal(enemigos, nuevo);    //se pasa par agregar a la lista
+                x+=40;
+            }
+            y+=60;
+            x=200;
 
     }
+    break;
+    }
+	
     
 }
 
@@ -270,29 +444,53 @@ void Game::actualizarenemigos()
         {
             switch (enemigo->estado) 
             {
-                case 100: // Salida inicial
-                    if (fabs(enemigo->x - (enemigo->origenx+30)) > 1.0f)
-                        enemigo->x += 0.7f * ((enemigo->origenx+30> enemigo->x) ? 1 : -1);
-                    if (fabs(enemigo->y - (enemigo->origeny-15)) > 1.0f)
-                        enemigo->y += 0.5f * ((enemigo->origeny-15 > enemigo->y) ? 1 : -1);
+                case 100: // Salida inicial (baja hasta y = 340)
+                    if (fabs(enemigo->y - 340.0f) > 1.0f)
+                        enemigo->y += 0.5f * ((340.0f > enemigo->y) ? 1 : -1);
 
-                    // Llegó al punto de salto
-                    if (fabs(enemigo->x - (enemigo->origenx+30)) <= 1.0f &&
-                        fabs(enemigo->y - (enemigo->origeny-15)) <= 1.0f) {
+                    // Llegó al punto de ataque
+                    if (fabs(enemigo->y - 340.0f) <= 1.0f) {
                         enemigo->estado = 101;
+                    }
+                    enemigo->x += -1 * enemigo->dx; //se hace al mismo tiempo movimiento horizontal con dx definido
+
+                    if (enemigo->x >= enemigo->origenx + 150 ||
+                        enemigo->x <= enemigo->origenx - 150) //si se llego aciertas posiciones
+                    {
+                        enemigo->dx *= -1; // Cambia de dirección
                     }
                     break;
 
                 case 101: // Descenso hacia nave->x
+                {
+                    bool colisionaConOtro = false;
+                    ptr_est otro = enemigos;
+                    while (otro != nullptr) {
+                        if (otro != enemigo && 
+                            !(enemigo->x + 30 < otro->x || enemigo->x > otro->x + 30 ||
+                            enemigo->y + 30 < otro->y || enemigo->y > otro->y + 30)) {
+                            colisionaConOtro = true;
+                            break;
+                        }
+                        otro = otro->Siguiente;
+                    }
+                    if(enemigo->y>400 && enemigo->Disparo!=0 && al_get_time()- enemigo->Tiempo>=2)
+                        {
+                            enemigo->Disparo-=1;
+                            enemigo->Tiempo=al_get_time();
+                            crearbala(-3, enemigo->x + 15, enemigo->y + 50); // Dispara bala
+                        }
+                    if (!colisionaConOtro)
+                         enemigo->y += 1.2f; // Solo se mueve si no colisiona
+
                     if (fabs(enemigo->x - nave->x) > 1.0f)
                         enemigo->x += 0.7f * ((nave->x > enemigo->x) ? 1 : -1);
-                    enemigo->y += 1.2f;
 
                     if (enemigo->y >= nave->y) {
                         enemigo->estado = 102;
                     }
                     break;
-
+                }
                 case 102: // modificar por aparición de arriba a origen 
                     ptr_est borrar = enemigo;
                     ptr_est anterior = enemigos;
@@ -314,6 +512,7 @@ void Game::actualizarenemigos()
         enemigo = enemigo->Siguiente;
     }
 }
+
 void limpiarenemigos() // se encarga de limpiar la cola de enemigos
 {
     ptr_est aux = enemigos;
@@ -325,26 +524,20 @@ void limpiarenemigos() // se encarga de limpiar la cola de enemigos
     }
     enemigos = nullptr; // Importante para evitar punteros colgantes
 }
-bool puedeAtacar(ptr_est e)// hay que arreglar para  que solo se muevan los que estan en los bordes y no tienen otro arriba podriamos hacer otra idea
- {
-    ptr_est aux = enemigos;
-    int contador=0;
-    while(aux!=nullptr)
-    {
-        contador+=1;
-        aux=aux->Siguiente;
-    }
-    aux=enemigos;
 
-    while (aux != nullptr) 
-    {
-        if (aux != e && aux->col == e->col && aux->y < e->y && aux->ataque == 0) {
-            return false;
-        }
+
+bool puedeAtacar(ptr_est e) {
+    ptr_est aux = enemigos;
+
+    while (aux != nullptr) {
+        if (aux != e && aux->col == e->col && aux->fila > e->fila)
+            return false; // Hay alguien debajo
         aux = aux->Siguiente;
     }
-    return true;
+
+    return true; // Nadie debajo, puede atacar
 }
+
 
 void Game::crearnave()
 {
@@ -472,7 +665,7 @@ void Game::update() {
         ptr_est aux = enemigos;
 
         while (aux != nullptr) {
-            if (aux->col >= 1 && aux->ataque == 0 && puedeAtacar(aux)) 
+            if (aux->ataque == 0 && puedeAtacar(aux)) 
             {
                 aux->ataque = 1;
                 aux->estado = 100; // estado de ataque
@@ -483,6 +676,12 @@ void Game::update() {
         }
     
     tiempoUltimoAtaque = al_get_time();
+    }
+    if(enemigos==nullptr)
+    {
+        nivel++;
+        crearnivel();
+        tiempoUltimoAtaque = al_get_time();
     }
     actualizarenemigos();
     colisiones();
