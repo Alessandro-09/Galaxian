@@ -16,12 +16,20 @@
 using namespace std;
 int nivel=1;
 bool derecha = false, izquierda = false;
+double tiempoUltimoAtaque = 0;
 typedef struct  Bala
 {
     float x, y;
     float velocidad;
     Bala* siguiente;
 }*ptr_bala;
+
+typedef struct Balaenemiga
+{
+    float x,y;
+    float velocidad;
+    Balaenemiga* siguiente;    
+}*ptr_balaenemiga;
 
 typedef struct personaje
 {
@@ -48,6 +56,7 @@ typedef struct navesenemigas
    navesenemigas* Siguiente; 
 }*ptr_est;
 
+ptr_balaenemiga Balasenemigas;
 ptr_bala Balas;
 ptr_est enemigos;
 ptr_nave nave;
@@ -104,6 +113,7 @@ void Game::dibujarenemigos() const
         aux = aux->Siguiente;
     }
 }
+
 void Game::crearnivel()
 {
      ptr_est nuevo;
@@ -145,7 +155,7 @@ void Game::crearnivel()
             nuevo->y=y;
             nuevo->origenx=x;
             nuevo->origeny=y;
-            nuevo->col=i;
+            nuevo->col=i+11-col;
             nuevo->fila=fila;
             nuevo->dx = 1;
             nuevo->dy = 0;
@@ -251,15 +261,77 @@ void Game::actualizarenemigos()
             }
             enemigo->x += -1 * enemigo->dx;
 
-            if (enemigo->x >= enemigo->origenx + 100 ||
-                enemigo->x <= enemigo->origenx - 100)
+            if (enemigo->x >= enemigo->origenx + 150 ||
+                enemigo->x <= enemigo->origenx - 150)
             {
                 enemigo->dx *= -1; // Cambia de dirección
             }
-        }
+        } 
+        if (enemigo->ataque == 1) 
+        {
+            switch (enemigo->estado) {
+                case 100: // Salida inicial
+                    if (fabs(enemigo->x - (enemigo->origenx+30)) > 1.0f)
+                        enemigo->x += 0.7f * ((enemigo->origenx+30> enemigo->x) ? 1 : -1);
+                    if (fabs(enemigo->y - (enemigo->origeny-15)) > 1.0f)
+                        enemigo->y += 0.5f * ((enemigo->origeny-15 > enemigo->y) ? 1 : -1);
+
+                    // Llegó al punto de salto
+                    if (fabs(enemigo->x - (enemigo->origenx+30)) <= 1.0f &&
+                        fabs(enemigo->y - (enemigo->origeny-15)) <= 1.0f) {
+                        enemigo->estado = 101;
+                    }
+                    break;
+
+                case 101: // Descenso hacia nave->x
+                    if (fabs(enemigo->x - nave->x) > 1.0f)
+                        enemigo->x += 0.7f * ((nave->x > enemigo->x) ? 1 : -1);
+                    enemigo->y += 1.2f;
+
+                    if (enemigo->y >= nave->y) {
+                        enemigo->estado = 102;
+                    }
+                    break;
+
+                case 102: // Borrado
+                    ptr_est borrar = enemigo;
+                    ptr_est anterior = enemigos;
+
+                    if (borrar == enemigos) {
+                        enemigos = borrar->Siguiente;
+                    } else {
+                        while (anterior && anterior->Siguiente != borrar)
+                            anterior = anterior->Siguiente;
+                        if (anterior) anterior->Siguiente = borrar->Siguiente;
+                    }
+
+                    enemigo = borrar->Siguiente;
+                    delete borrar;
+                    continue;
+            }
+    }
 
         enemigo = enemigo->Siguiente;
     }
+}
+bool puedeAtacar(ptr_est e) {
+    ptr_est aux = enemigos;
+    int contador=0;
+    while(aux!=nullptr)
+    {
+        contador+=1;
+        aux=aux->Siguiente;
+    }
+    aux=enemigos;
+
+    while (aux != nullptr) 
+    {
+        if (aux != e && aux->col == e->col && aux->y < e->y && aux->ataque == 0) {
+            return false;
+        }
+        aux = aux->Siguiente;
+    }
+    return true;
 }
 
 void Game::crearnave()
@@ -289,12 +361,12 @@ void Game::actualizarNave() {
 		nave->x -= 4;
 }
 
-void Game::crearbala()
+void Game::crearbala(int dy, int x, int y)
 {
     ptr_bala nueva=new Bala();
-    nueva->x=nave->x+15;
-    nueva->y=nave->y+30;
-    nueva->velocidad=3;
+    nueva->x=x;
+    nueva->y=y;
+    nueva->velocidad=dy;
     nueva->siguiente=nullptr;
     agregarBala(Balas,nueva);
 
@@ -308,6 +380,7 @@ void Game::dibujarbala() const
         aux = aux->siguiente;
     }
 }
+
 void Game::actualizarbala()
 {
     ptr_bala aux = Balas;
@@ -379,6 +452,22 @@ void Game::update() {
         {
             nave->bitmap = al_load_bitmap("pictures/nave1.png");
         }
+    }
+    if (al_get_time() - tiempoUltimoAtaque >= 4) 
+    {
+        ptr_est aux = enemigos;
+
+        while (aux != nullptr) {
+            if (aux->col >= 1 && aux->ataque == 0 && puedeAtacar(aux)) {
+                aux->ataque = 1;
+                aux->estado = 100; // estado de ataque
+
+                break; // solo un atacante a la vez
+            }
+            aux = aux->Siguiente;
+        }
+    
+    tiempoUltimoAtaque = al_get_time();
     }
     actualizarenemigos();
     colisiones();
@@ -478,7 +567,7 @@ int Game::run(SystemResources& sys) {
             {
                 nave->bitmap = nave->disparobitmap;
                 nave->tiempo = al_get_time(); // guardar tiempo del cambio
-                crearbala();
+                crearbala(3, nave->x+15, nave->y-30);
             }
         }
 
