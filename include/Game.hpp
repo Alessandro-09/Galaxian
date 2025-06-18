@@ -40,7 +40,7 @@ private:
 
     std::vector<Star> stars;
     void crearnivel();
-    void crearbala();
+    void crearbala(int dy, int x, int y);
     void colisiones();
     void actualizarenemigos();
     void actualizarbala();
