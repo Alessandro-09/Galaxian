@@ -32,6 +32,7 @@ typedef struct personaje//se crea una estructura para la nave
     int alto;              //atributo que va a contener el alto
     float x,y;             //atributo que va llevar la posición de la nave
     double tiempo;         //atributo para el tiempo de cambio entre las imagenes de la nave
+    int vida;
 }*ptr_nave;
 
 typedef struct navesenemigas//se crea una estructura para los enemigos
@@ -549,6 +550,7 @@ void Game::crearnave()
     nave->x=800/2;                                            //se toma el tamaño de la pantalla y se divide en 2
     nave->y= 550;                                             //se carga posición en y
     nave->tiempo=0;                                           // se establece tiempo de refresco
+    nave->vida=0;
 }
 void Game::dibujarnave() const
 {
