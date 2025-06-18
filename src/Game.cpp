@@ -14,52 +14,45 @@
 #include <string>
 
 using namespace std;
-int nivel=1;
-bool derecha = false, izquierda = false;
-double tiempoUltimoAtaque = 0;
-typedef struct  Bala
+int nivel=1; //variable para nivel
+bool derecha = false, izquierda = false;//comprobadores de bandera para el movimiento de la nave
+double tiempoUltimoAtaque = 0;//se toma para su tiempo de ataque de las naves enemigas
+typedef struct  Bala// estrutura para la lista enlazada de las balas
 {
-    float x, y;
-    float velocidad;
-    Bala* siguiente;
-}*ptr_bala;
+    float x, y;         //se creean su atributos x, y para posición
+    float velocidad;    //se crea su atributo de velocidad para su movimiento
+    Bala* siguiente;    //puntero siguiente para unir la lista enlazada
+}*ptr_bala;             // puntero a la estructura
 
-typedef struct Balaenemiga
+typedef struct personaje//se crea una estructura para la nave
 {
-    float x,y;
-    float velocidad;
-    Balaenemiga* siguiente;    
-}*ptr_balaenemiga;
-
-typedef struct personaje
-{
-    ALLEGRO_BITMAP*bitmap;
-    ALLEGRO_BITMAP* disparobitmap; 
-    int ancho;
-    int alto;
-    float x,y;
-    double tiempo;
+    ALLEGRO_BITMAP*bitmap; //se crea la variable bitmap para el uso de la imagen
+    ALLEGRO_BITMAP* disparobitmap; //atribuyo para el cambio al disparar
+    int ancho;             //atributo que va a contener el ancho
+    int alto;              //atributo que va a contener el alto
+    float x,y;             //atributo que va llevar la posición de la nave
+    double tiempo;         //atributo para el tiempo de cambio entre las imagenes de la nave
 }*ptr_nave;
-typedef struct navesenemigas
+
+typedef struct navesenemigas//se crea una estructura para los enemigos
 {
-    ALLEGRO_BITMAP* bitmap;
-    int col;
-    int fila;
-    float origenx, origeny;
-    int ancho;
-    int alto;
-    float x, y;
-    float dx, dy;
-    int ataque;
-    int estado;
+    ALLEGRO_BITMAP* bitmap;//se crea la variable bitmap para el uso de la imagen
+    int col;               //se guarda la columna a la que pertenece
+    int fila;              //se guarda la fila a la que pertenece
+    float origenx, origeny;//se guarda la posición original
+    int ancho;             //atributo que va a contener el ancho
+    int alto;              //atributo que va a contener el alto
+    float x, y;            //atributo que va llevar la posición de la nave
+    float dx, dy;          //se crea atributos para la velocidad
+    int ataque;            //se crea atributo para el ataque entre 1 y 0
+    int estado;            //se crea atributo para el estado de movimiento con codigos 0,1,2,3,100,101,102 hay que agregar más estados usen codigos 
 
    navesenemigas* Siguiente; 
 }*ptr_est;
 
-ptr_balaenemiga Balasenemigas;
-ptr_bala Balas;
-ptr_est enemigos;
-ptr_nave nave;
+ptr_bala Balas;           //lista que va a contener las balas
+ptr_est enemigos;         //lista que va a contener los enemigos
+ptr_nave nave;            //lista que va a contener la nave
 void agregaralfinal(ptr_est& lista, ptr_est Nuevo)
 {
 	ptr_est Aux;//Puntero creado
@@ -100,7 +93,7 @@ void agregarBala(ptr_bala& lista, ptr_bala Nuevo)
 Game::Game(ALLEGRO_FONT* font, int width, int height) 
     : font(font), width(width), height(height), 
       starSpeed(1.0f), speedMultiplier(1.0f), elapsedTime(0.0f) {  // Velocidad inicial 1.0
-    crearnivel();
+    crearnivel(); // se llama a las funcuones para empezar
     crearnave();
     generateStars();
 }
@@ -108,61 +101,61 @@ void Game::dibujarenemigos() const
 {
     ptr_est aux = enemigos;
     while (aux != nullptr) {
-        // Dibuja la imagen original escalada a 64x64 en (200, 100)
+        //se toma ancho y alto para poder reescalar la imagen
         al_draw_scaled_bitmap(aux->bitmap, 0, 0, aux->ancho, aux->alto,aux->x, aux->y,30, 30,0);
         aux = aux->Siguiente;
     }
 }
 
-void Game::crearnivel()
+void Game::crearnivel() //para creación de nivel
 {
-     ptr_est nuevo;
-    int x=190;
-    int y=40;
-    int col =10;
-	for (int fila = 0; fila < 5; fila++)//por 5 filas
+    ptr_est nuevo; //se crea un punteroa nuevo elmento de tipo enemigos
+    int x=190;                                  //se establece un x fijo para acomodar las naves
+    int y=40;                                   //se crea el y para el comienzo
+    int col =10;                                //se crea la cantidad de columnas
+	for (int fila = 0; fila < 5; fila++)        //por 5 filas
 	{
-        const char* ruta;
+        const char* ruta;                       //constante de tipo caracter para la ruta de laimagen ya que el al_load_bitmap solo acepta este datdo
         if( fila==0)
         {
-            ruta="pictures/navenemiga1.png";
-            x=250;
-            col=7;
+            ruta="pictures/navenemiga1.png";    //se carga la primera nave estas son las amarillas de arriba
+            x=250;                              // desde 250 para hacer ver la mitad
+            col=7;                              //se establece la cantidad que se va a dibujar
         }
-        else if( fila==1)
+        else if( fila==1)                       //si  es fila 1 en otras la 2 para nosostros
         {
-            ruta="pictures/navenemiga2.png";
+            ruta="pictures/navenemiga2.png";    //se carga la primera nave estas son las rojas
             x=200;
-            col=9;
+            col=9;                              //se establece la cantidad que se va a dibujar
         }
          else if( fila==2)
          {
-            ruta="pictures/navenemiga4.png";
-            col=11;
+            ruta="pictures/navenemiga4.png";    //se carga la primera nave estas son las moradas
+            col=11;                             //se establece la cantidad que se va a dibujar
         }
          else
          {
             ruta="pictures/navenemiga3.png";
          }
-		for (int i = 0; i < col; i++)//cantidad bloques
+		for (int i = 0; i < col; i++)           //cantidad naves 
 		{
 
-            nuevo= new navesenemigas();
-            nuevo->bitmap=al_load_bitmap(ruta);
-            nuevo->alto= al_get_bitmap_height(nuevo->bitmap);
+            nuevo= new navesenemigas();         // se ccea nuevo elemento de navesenemigas
+            nuevo->bitmap=al_load_bitmap(ruta); //se carga la imagen
+            nuevo->alto= al_get_bitmap_height(nuevo->bitmap); //se carga su alto y ancho segun la imagen
             nuevo->ancho=al_get_bitmap_width(nuevo->bitmap);
-            nuevo->x=x;
-            nuevo->y=y;
-            nuevo->origenx=x;
-            nuevo->origeny=y;
-            nuevo->col=i+11-col;
-            nuevo->fila=fila;
-            nuevo->dx = 1;
-            nuevo->dy = 0;
-            nuevo->ataque=0;
-            nuevo->estado=0;
+            nuevo->x=x;                         //se pasa el x de dibujo
+            nuevo->y=y;                         //se pasas el y
+            nuevo->origenx=x;                   //se pasa para guadar posición de origen 
+            nuevo->origeny=y;                   //se para guardar posición de origen y
+            nuevo->col=i+11-col;                // se calcula su colomna
+            nuevo->fila=fila;                   //se pasa su fila 
+            nuevo->dx = 1;                      //se le da una velocidad lateral
+            nuevo->dy = 0;                      //se pone y en 0
+            nuevo->ataque=0;                    //se le pone estado de no ataque
+            nuevo->estado=0;                    //se pone estadode no movimiento
             nuevo->Siguiente=nullptr;
-            agregaralfinal(enemigos, nuevo);
+            agregaralfinal(enemigos, nuevo);    //se pasa par agregar a la lista
             x+=40;
          }
          y+=60;
@@ -172,31 +165,31 @@ void Game::crearnivel()
     
 }
 
-void Game::colisiones()
+void Game::colisiones()                        //encargada de ciertas colisiones
 {
-    ptr_bala aux=Balas;
-    ptr_bala aux2=nullptr;
+    ptr_bala aux=Balas;                        //puntero que apunta a lo mismo que la lista
+    ptr_bala aux2=nullptr;                     //puntero auxiliar
  
     while (aux != nullptr)
     {
-        ptr_est enemigo = enemigos;
+        ptr_est enemigo = enemigos;           //puntero que apunta a lo mismo que lista enemigos y luego su auxiliar
         ptr_est enemigo2 = nullptr;
-        bool colision = false;
+        bool colision = false;                //flag de colisión
 
-        while (enemigo != nullptr && !colision)
+        while (enemigo != nullptr && !colision)//se verifica si hay colision y se se acabo la lista
         {
             if (!(aux->x + 30 < enemigo->x || aux->x > enemigo->x + 30 ||
-                  aux->y + 30 < enemigo->y || aux->y > enemigo->y + 30))
+                  aux->y + 30 < enemigo->y || aux->y > enemigo->y + 30))//todo negado se calcula segun lo siguiente si la bala se encuentra entre su posición +30  y si el enemigo más 30 es mayor
             {
                 // Eliminar enemigo
-                if (enemigo2 == nullptr)
-                    enemigos = enemigo->Siguiente;
+                if (enemigo2 == nullptr)// se toma si el auxiliar esta en blanco
+                    enemigos = enemigo->Siguiente;// entonces la lista pasa al siguiente
                 else
-                    enemigo2->Siguiente = enemigo->Siguiente;
+                    enemigo2->Siguiente = enemigo->Siguiente;//si no enemigo 2 siguiente va a ser el siguiente del enemigo cambe destacar que enemigo 2 es el anterior
 
-                delete enemigo;
+                delete enemigo;  //se elimina
 
-                // Eliminar bala
+                // se hace lo mismo con la bala
                 ptr_bala borrar = aux;
                 if (aux2 == nullptr)
                     Balas = aux->siguiente;
@@ -210,8 +203,8 @@ void Game::colisiones()
             }
             else
             {
-                enemigo2 = enemigo;
-                enemigo = enemigo->Siguiente;
+                enemigo2 = enemigo;// si no enemigo 2 toma el actual
+                enemigo = enemigo->Siguiente;// y enemigo pasa al siguiente
             }
         }
 
@@ -225,51 +218,58 @@ void Game::colisiones()
 void Game::actualizarenemigos()
 {
     ptr_est enemigo = enemigos;
-    float velocidad = 0.15f;
-    int rango = 20;
+    float velocidad = 0.15f;//se pone velocidad
+    int rango = 20;         //desde un rango de 20 
 
     while (enemigo != NULL) {
-        if (enemigo->ataque != 1) {
-            switch (enemigo->estado) {
-                case 0: // Bajando
-                    enemigo->y += velocidad;
-                    if (enemigo->y >= enemigo->origeny + rango) {
-                        enemigo->estado = 1; // Cambia a volver al origen
+        if (enemigo->ataque != 1) //si no esta atacando
+        {
+            switch (enemigo->estado) //se lee su estado
+            {
+                case 0: //caso de moviento vertical abajo
+                    enemigo->y += velocidad; //se le suma la velocidad a y
+                    if (enemigo->y >= enemigo->origeny + rango) //y si llego al rango regresa
+                    {
+                        enemigo->estado = 1; // Cambia el estado
                     }
                     break;
 
                 case 1: // Volviendo al origen desde abajo
                     enemigo->y -= velocidad;
-                    if (enemigo->y <= enemigo->origeny) {
+                    if (enemigo->y <= enemigo->origeny)//si llego al origen
+                     {
                         enemigo->estado = 2; // Cambia a subir
                     }
                     break;
 
                 case 2: // Subiendo
                     enemigo->y -= velocidad;
-                    if (enemigo->y <= enemigo->origeny - rango) {
+                    if (enemigo->y <= enemigo->origeny - rango) //si su movimiento llego al limite
+                    {
                         enemigo->estado = 3; // Cambia a volver al origen desde arriba
                     }
                     break;
 
                 case 3: // Volviendo al origen desde arriba
                     enemigo->y += velocidad;
-                    if (enemigo->y >= enemigo->origeny) {
+                    if (enemigo->y >= enemigo->origeny)//volvio al origen
+                     {
                         enemigo->estado = 0; // Vuelve a bajar
                     }
                     break;
             }
-            enemigo->x += -1 * enemigo->dx;
+            enemigo->x += -1 * enemigo->dx; //se hace al mismo tiempo movimiento horizontal con dx definido
 
             if (enemigo->x >= enemigo->origenx + 150 ||
-                enemigo->x <= enemigo->origenx - 150)
+                enemigo->x <= enemigo->origenx - 150) //si se llego aciertas posiciones
             {
                 enemigo->dx *= -1; // Cambia de dirección
             }
         } 
-        if (enemigo->ataque == 1) 
+        if (enemigo->ataque == 1) //en proceso ataque 
         {
-            switch (enemigo->estado) {
+            switch (enemigo->estado) 
+            {
                 case 100: // Salida inicial
                     if (fabs(enemigo->x - (enemigo->origenx+30)) > 1.0f)
                         enemigo->x += 0.7f * ((enemigo->origenx+30> enemigo->x) ? 1 : -1);
@@ -293,7 +293,7 @@ void Game::actualizarenemigos()
                     }
                     break;
 
-                case 102: // Borrado
+                case 102: // modificar por aparición de arriba a origen 
                     ptr_est borrar = enemigo;
                     ptr_est anterior = enemigos;
 
@@ -314,7 +314,7 @@ void Game::actualizarenemigos()
         enemigo = enemigo->Siguiente;
     }
 }
-void limpiarenemigos()
+void limpiarenemigos() // se encarga de limpiar la cola de enemigos
 {
     ptr_est aux = enemigos;
     while (aux != nullptr)
@@ -325,7 +325,8 @@ void limpiarenemigos()
     }
     enemigos = nullptr; // Importante para evitar punteros colgantes
 }
-bool puedeAtacar(ptr_est e) {
+bool puedeAtacar(ptr_est e)// hay que arreglar para  que solo se muevan los que estan en los bordes y no tienen otro arriba podriamos hacer otra idea
+ {
     ptr_est aux = enemigos;
     int contador=0;
     while(aux!=nullptr)
@@ -347,28 +348,29 @@ bool puedeAtacar(ptr_est e) {
 
 void Game::crearnave()
 {
-    nave= new personaje();
-    nave->bitmap=al_load_bitmap("pictures/nave1.png");
-    nave->disparobitmap=al_load_bitmap("pictures/nave2.png");
-    nave->alto=al_get_bitmap_height(nave->bitmap);
-    nave->ancho=al_get_bitmap_width(nave->bitmap);
-    nave->x=800/2;
-    nave->y= 550;
-    nave->tiempo=0;
+    nave= new personaje();   //se crea puntero a struct
+    nave->bitmap=al_load_bitmap("pictures/nave1.png"); //se carga imagen principal
+    nave->disparobitmap=al_load_bitmap("pictures/nave2.png"); //se carga imagen de disparo
+    nave->alto=al_get_bitmap_height(nave->bitmap);            //se carga su ancho y alto segun imagen
+    nave->ancho=al_get_bitmap_width(nave->bitmap);  
+    nave->x=800/2;                                            //se toma el tamaño de la pantalla y se divide en 2
+    nave->y= 550;                                             //se carga posición en y
+    nave->tiempo=0;                                           // se establece tiempo de refresco
 }
 void Game::dibujarnave() const
 {
-     al_draw_scaled_bitmap(nave->bitmap, 0, 0, nave->ancho, nave->alto,nave->x, nave->y,30, 30,0);
+     al_draw_scaled_bitmap(nave->bitmap, 0, 0, nave->ancho, nave->alto,nave->x, nave->y,30, 30,0);//se dibuja reescalada la nave
 }
-void Game::actualizarNave() {
+void Game::actualizarNave()
+ {
 
-    if (nave->x + 30 > 800)
+    if (nave->x + 30 > 800)//se mueve si no ha llegado al limite x
 		derecha = false;
 	if (nave->x < 0)
 		izquierda = false;
-	if (derecha)
+	if (derecha)//A la derecha 
 		nave->x += 4;
-	if (izquierda)
+	if (izquierda) // a la izquiersa
 		nave->x -= 4;
 }
 
@@ -386,7 +388,7 @@ void Game::dibujarbala() const
 {
     ptr_bala aux = Balas;
     while (aux != nullptr) {
-        // Dibuja la imagen original escalada a 64x64 en (200, 100)
+        // se rescala y se suma 10 y 4 a x para que aparezca encima de la nave
         al_draw_filled_rectangle(aux->x, aux->y, aux->x + 4, aux->y + 10, al_map_rgb(255, 255, 0));
         aux = aux->siguiente;
     }
@@ -405,17 +407,18 @@ void Game::actualizarbala()
             ptr_bala eliminar = aux;
 
             if (anterior == nullptr) {
-                // Es la primera bala
+                //esa la primera entonces paselo a balas
                 Balas = aux->siguiente;
                 aux = Balas;
-            } else {
-                anterior->siguiente = aux->siguiente;
+            } else
+             {
+                anterior->siguiente = aux->siguiente;// si no siga agregando
                 aux = aux->siguiente;
             }
 
             delete eliminar;
         } else {
-            // Solo avanzamos si no eliminamos
+            //pasamos a la siguiente
             anterior = aux;
             aux = aux->siguiente;
         }
@@ -457,19 +460,20 @@ void Game::update() {
         }
         
     }
-    if (nave->bitmap == nave->disparobitmap) 
+    if (nave->bitmap == nave->disparobitmap) //si esta en la imagen de disparo
     {
-        if (al_get_time() - nave->tiempo > 1.0) 
+        if (al_get_time() - nave->tiempo > 1.0) // SE cumplió en el tiempo?
         {
-            nave->bitmap = al_load_bitmap("pictures/nave1.png");
+            nave->bitmap = al_load_bitmap("pictures/nave1.png");// cambie de imagen
         }
     }
-    if (al_get_time() - tiempoUltimoAtaque >= 4) 
+    if (al_get_time() - tiempoUltimoAtaque >= 4) //se cumplió 4s desde el ultimo ataque?
     {
         ptr_est aux = enemigos;
 
         while (aux != nullptr) {
-            if (aux->col >= 1 && aux->ataque == 0 && puedeAtacar(aux)) {
+            if (aux->col >= 1 && aux->ataque == 0 && puedeAtacar(aux)) 
+            {
                 aux->ataque = 1;
                 aux->estado = 100; // estado de ataque
 
