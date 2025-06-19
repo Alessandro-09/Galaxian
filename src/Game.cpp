@@ -389,6 +389,62 @@ void Game::colisiones()                        //encargada de ciertas colisiones
             aux = aux->siguiente;
         }
     }
+    aux = Balas;
+    aux2 = nullptr;
+    bool colision = false; // Flag de colisión
+
+    // Colisiones entre balas y la nave
+    while (aux != nullptr)
+    {
+        if (!(aux->x + 30 < nave->x || aux->x > nave->x + 30 ||
+            aux->y+15 < nave->y || aux->y > nave->y+15 ))
+        {
+            ptr_bala borrar = aux;
+            if (aux2 == nullptr)
+                Balas = aux->siguiente;
+            else
+                aux2->siguiente = aux->siguiente;
+
+            aux = borrar->siguiente;
+            delete borrar;
+            nave->vida -= 1;
+            colision = true; // ← Se marca que hubo colisión
+            cout << "colision" << std::endl;
+            continue; // Saltar incremento de aux2 (ya lo hicimos al eliminar)
+        }
+
+        aux2 = aux;
+        aux = aux->siguiente;
+    }
+
+    // Colisiones entre enemigos y la nave
+    ptr_est enemigo = enemigos;
+    ptr_est enemigo2 = nullptr;
+
+    while (enemigo != nullptr && !colision) // ← Aquí colision ahora sí tiene efecto
+    {
+        if (!(enemigo->x + 30 < nave->x || enemigo->x > nave->x + 30 ||
+            enemigo->y + 30 < nave->y || enemigo->y > nave->y + 30))
+        {
+            cout << "colision" << std::endl;
+            nave->vida -= 1;
+            ptr_est eliminar = enemigo;
+            if (enemigo2 == nullptr)
+                enemigos = enemigo->Siguiente;
+            else
+                enemigo2->Siguiente = enemigo->Siguiente;
+
+            enemigo = eliminar->Siguiente;
+            delete eliminar;
+        }
+        else
+        {
+            enemigo2 = enemigo;
+            enemigo = enemigo->Siguiente;
+        }
+    }
+
+
 }
 void Game::actualizarenemigos()
 {
@@ -550,7 +606,7 @@ void Game::crearnave()
     nave->x=800/2;                                            //se toma el tamaño de la pantalla y se divide en 2
     nave->y= 550;                                             //se carga posición en y
     nave->tiempo=0;                                           // se establece tiempo de refresco
-    nave->vida=0;
+    nave->vida=3;
 }
 void Game::dibujarnave() const
 {
@@ -788,7 +844,12 @@ int Game::run(SystemResources& sys) {
                 crearbala(3, nave->x+15, nave->y-30);
             }
         }
+        if(nave->vida<=0)
+        {
+            running=false;
+            limpiarenemigos();
 
+        }
         else if (event.type == ALLEGRO_EVENT_TIMER) {
             update();
             draw();
