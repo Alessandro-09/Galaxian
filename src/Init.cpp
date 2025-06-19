@@ -4,7 +4,7 @@
 #include <iostream>
 
 SystemResources initializeSystem(int width, int height, const char* fontPath, int fontSize) {
-    SystemResources sys = {nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, width, height};
+    SystemResources sys = {nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, width, height};
 
     // 1. Inicialización básica de Allegro
     if (!al_init()) {
@@ -63,6 +63,8 @@ SystemResources initializeSystem(int width, int height, const char* fontPath, in
     sys.instructionsMusic = al_load_audio_stream("assets/instructions_music.ogg", 4, 2048);
     sys.shootSound = al_load_sample("assets/shoot.ogg");
     sys.hitEnemySound = al_load_sample("assets/hit_enemy.ogg");
+    sys.hitPlayerSound = al_load_sample("assets/hit_player.ogg");
+
 
     if (!sys.menuMusic) {
         std::cerr << "Advertencia: No se pudo cargar la música del menú." << std::endl;
@@ -89,8 +91,12 @@ SystemResources initializeSystem(int width, int height, const char* fontPath, in
     }
 
     if (!sys.hitEnemySound) {
-        std::cerr << "Error: No se pudo cargar hit_enemy.ogg. Ruta: " << al_get_current_directory() << std::endl;
-    } 
+        std::cerr << "Error: No se pudo cargar hit_enemy.ogg." << std::endl;
+    }
+
+    if (!sys.hitPlayerSound) {
+        std::cerr << "Error: No se pudo cargar hit_player.ogg." << std::endl;
+    }
 
     // 8. Registrar fuentes de eventos
     al_register_event_source(sys.eventQueue, al_get_display_event_source(sys.display));
@@ -112,6 +118,10 @@ void cleanupSystem(SystemResources& sys) {
         al_detach_audio_stream(sys.instructionsMusic);
         al_destroy_audio_stream(sys.instructionsMusic);
     }
+    if (sys.shootSound) al_destroy_sample(sys.shootSound);
+    if (sys.hitEnemySound) al_destroy_sample(sys.hitEnemySound);
+    if (sys.hitPlayerSound) al_destroy_sample(sys.hitPlayerSound);
+    
     if (sys.font) al_destroy_font(sys.font);
     if (sys.timer) al_destroy_timer(sys.timer);
     if (sys.eventQueue) al_destroy_event_queue(sys.eventQueue);

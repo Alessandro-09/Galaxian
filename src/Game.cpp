@@ -360,7 +360,6 @@ void Game::colisiones(SystemResources& sys)                        //encargada d
                 // Reproducir sonido de impacto
                 if (sys.hitEnemySound) {
                     al_play_sample(sys.hitEnemySound, 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, nullptr);
-                    std::cout << "Reproduciendo sonido de impacto\n";
                 }
                 
                 // Eliminar enemigo
@@ -406,6 +405,10 @@ void Game::colisiones(SystemResources& sys)                        //encargada d
         if (!(aux->x + 30 < nave->x || aux->x > nave->x + 30 ||
             aux->y+15 < nave->y || aux->y > nave->y+15 ))
         {
+            if (sys.hitPlayerSound) {
+                al_play_sample(sys.hitPlayerSound, 1.5f, 0.0f, 1.0f, ALLEGRO_PLAYMODE_ONCE, nullptr);
+            }
+
             ptr_bala borrar = aux;
             if (aux2 == nullptr)
                 Balas = aux->siguiente;
@@ -433,6 +436,10 @@ void Game::colisiones(SystemResources& sys)                        //encargada d
         if (!(enemigo->x + 30 < nave->x || enemigo->x > nave->x + 30 ||
             enemigo->y + 30 < nave->y || enemigo->y > nave->y + 30))
         {
+            if (sys.hitPlayerSound) {
+                al_play_sample(sys.hitPlayerSound, 1.5f, 0.0f, 1.0f, ALLEGRO_PLAYMODE_ONCE, nullptr);
+            }
+            
             cout << "colision" << std::endl;
             nave->vida -= 1;
             ptr_est eliminar = enemigo;

@@ -16,8 +16,9 @@ struct SystemResources {
     ALLEGRO_AUDIO_STREAM* menuMusic;       // Música para el menú principal
     ALLEGRO_AUDIO_STREAM* instructionsMusic; // Música para la pantalla de instrucciones 
     ALLEGRO_SAMPLE* shootSound;          // Sonido de disparo
-    ALLEGRO_SAMPLE* hitEnemySound;       // Sonido de golpe a enemigo      
-    
+    ALLEGRO_SAMPLE* hitEnemySound;       // Sonido de golpe a enemigo  
+    ALLEGRO_SAMPLE* hitPlayerSound;      // Sonido de golpe al jugador
+
     int width;
     int height;
 };
