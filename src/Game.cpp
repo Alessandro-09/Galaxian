@@ -208,19 +208,19 @@ void Game::crearnivel() //para creación de nivel
             case 0:
                 ruta=ruta1;
                 col=1;
-                x=250;
+                x=600;
                 break;
            case 1:
            {
                 ruta=ruta2;
                 col=2;
-                x=225;
+                x=575;
                 break;
             }
             case 2:
                 ruta=ruta3;
                 col=4;
-                x=200;
+                x=550;
                 break;
             default:
                 ruta=ruta4;
@@ -251,7 +251,7 @@ void Game::crearnivel() //para creación de nivel
                 x+=40;
             }
             y+=60;
-            x=200;
+            x=550;
         }
         break;
     case 2:
@@ -262,19 +262,19 @@ void Game::crearnivel() //para creación de nivel
             case 0:
                 ruta=ruta1;
                 col=2;
-                x=250;
+                x=570;
                 break;
            case 1:
            {
                 ruta=ruta2;
                 col=3;
-                x=225;
+                x=545;
                 break;
             }
             case 2:
                 ruta=ruta3;
                 col=5;
-                x=200;
+                x=520;
                 break;
             default:
                 ruta=ruta4;
@@ -304,7 +304,7 @@ void Game::crearnivel() //para creación de nivel
                 x+=40;
             }
             y+=60;
-            x=200;
+            x=520;
         }
         break;
     case 3:
@@ -315,19 +315,19 @@ void Game::crearnivel() //para creación de nivel
             case 0:
                 ruta=ruta1;
                 col=3;
-                x=250;
+                x=540;
                 break;
            case 1:
            {
                 ruta=ruta2;
                 col=5;
-                x=225;
+                x=515;
                 break;
             }
             case 2:
                 ruta=ruta3;
                 col=7;
-                x=200;
+                x=490;
                 break;
             default:
                 ruta=ruta4;
@@ -357,7 +357,7 @@ void Game::crearnivel() //para creación de nivel
                 x+=40;
             }
             y+=60;
-            x=200;
+            x=490;
         }
         break;
     default:
@@ -368,19 +368,19 @@ void Game::crearnivel() //para creación de nivel
             case 0:
                 ruta=ruta1;
                 col=4;
-                x=250;
+                x=510;
                 break;
            case 1:
            {
                 ruta=ruta2;
                 col=6;
-                x=225;
+                x=485;
                 break;
             }
             case 2:
                 ruta=ruta3;
                 col=8;
-                x=200;
+                x=460;
                 break;
             default:
                 ruta=ruta4;
@@ -410,7 +410,7 @@ void Game::crearnivel() //para creación de nivel
                 x+=40;
             }
             y+=60;
-            x=200;
+            x=460;
 
     }
     break;
@@ -590,8 +590,8 @@ void Game::actualizarenemigos(SystemResources& sys)
             }
             enemigo->x += -1 * enemigo->dx; //se hace al mismo tiempo movimiento horizontal con dx definido
 
-            if (enemigo->x >= enemigo->origenx + 150 ||
-                enemigo->x <= enemigo->origenx - 150) //si se llego aciertas posiciones
+            if (enemigo->x >= enemigo->origenx + 300 ||
+                enemigo->x <= enemigo->origenx - 300) //si se llego aciertas posiciones
             {
                 enemigo->dx *= -1; // Cambia de dirección
             }
@@ -620,8 +620,8 @@ void Game::actualizarenemigos(SystemResources& sys)
                     }
                     enemigo->x += -1 * enemigo->dx; //se hace al mismo tiempo movimiento horizontal con dx definido
 
-                    if (enemigo->x >= enemigo->origenx + 150 ||
-                        enemigo->x <= enemigo->origenx - 150) //si se llego aciertas posiciones
+                    if (enemigo->x >= enemigo->origenx + 300 ||
+                        enemigo->x <= enemigo->origenx - 300) //si se llego aciertas posiciones
                     {
                         enemigo->dx *= -1; // Cambia de dirección
                     }
@@ -721,7 +721,7 @@ void Game::crearnave()
     nave->disparobitmap=al_load_bitmap("pictures/nave2.png"); //se carga imagen de disparo
     nave->alto=al_get_bitmap_height(nave->bitmap);            //se carga su ancho y alto segun imagen
     nave->ancho=al_get_bitmap_width(nave->bitmap);  
-    nave->x=800/2;                                            //se toma el tamaño de la pantalla y se divide en 2
+    nave->x=1280/2;                                            //se toma el tamaño de la pantalla y se divide en 2
     nave->y= height - 80;                                          //se carga posición en y
     nave->tiempo=0;                                           // se establece tiempo de refresco
     nave->vida=3;
@@ -733,7 +733,7 @@ void Game::dibujarnave() const
 void Game::actualizarNave(SystemResources& sys)
  {
 
-    if (nave->x + 30 > 800)//se mueve si no ha llegado al limite x
+    if (nave->x + 30 > 1280)//se mueve si no ha llegado al limite x
 		derecha = false;
 	if (nave->x < 0)
 		izquierda = false;
