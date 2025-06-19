@@ -798,27 +798,55 @@ void Game::update(SystemResources& sys) {
 void Game::draw() const {
     al_clear_to_color(al_map_rgb(5, 2, 10)); // Fondo oscuro del espacio
     
-    // Dibujar puntajes en la parte superior
+    // ===== PUNTAJES EN LA PARTE SUPERIOR (CON FUENTE PEQUEÑA) =====
     std::string scoreText = "SCORE: " + std::to_string(currentScore);
     std::string highScoreText = "HIGH SCORE: " + std::to_string(highScore);
     
-    // Puntaje actual (izquierda)
-    al_draw_text(font, al_map_rgb(255, 255, 255), 20, 10, 
+    // Puntaje actual (izquierda, fuente pequeña)
+    al_draw_text(smallFont, al_map_rgb(255, 255, 255), 10, 5, 
                  ALLEGRO_ALIGN_LEFT, scoreText.c_str());
     
-    // High score (derecha)
-    al_draw_text(font, al_map_rgb(255, 255, 0), width - 20, 10, 
+    // High score (derecha, fuente pequeña)
+    al_draw_text(smallFont, al_map_rgb(255, 255, 0), width - 10, 5, 
                  ALLEGRO_ALIGN_RIGHT, highScoreText.c_str());
     
-    // Vidas restantes (centro)
-    std::string livesText = "LIVES: " + std::to_string(nave->vida);
-    al_draw_text(font, al_map_rgb(255, 100, 100), width/2, 10, 
-                 ALLEGRO_ALIGN_CENTER, livesText.c_str());
+    // ===== VIDAS COMO NAVES EN LA PARTE INFERIOR IZQUIERDA =====
+    // Posición base para las vidas
+    int livesX = 20;          // Posición X inicial
+    int livesY = height - 50; // Posición Y (cerca del fondo)
+    int spacing = 35;         // Espacio entre cada nave
     
+    // Dibujar tantas naves como vidas tenga el jugador
+    for (int i = 0; i < nave->vida; ++i) {
+        // Dibujar la imagen de la nave (usando el bitmap de disparo para que se vea diferente)
+        if (nave->disparobitmap) {
+            al_draw_scaled_bitmap(nave->disparobitmap, 
+                                0, 0, 
+                                nave->ancho, nave->alto,
+                                livesX + (i * spacing), livesY, 
+                                25, 25, // Tamaño pequeño para las vidas
+                                0);
+        } else if (nave->bitmap) {
+            // Si no hay bitmap de disparo, usar el normal
+            al_draw_scaled_bitmap(nave->bitmap, 
+                                0, 0, 
+                                nave->ancho, nave->alto,
+                                livesX + (i * spacing), livesY, 
+                                25, 25, // Tamaño pequeño para las vidas
+                                0);
+        }
+    }
+    
+    // Texto "LIVES:" antes de las naves
+    al_draw_text(smallFont, al_map_rgb(255, 100, 100), livesX, livesY - 25, 
+                 ALLEGRO_ALIGN_LEFT, "LIVES:");
+    
+    // ===== DIBUJAR ELEMENTOS DEL JUEGO =====
     dibujarenemigos();
     dibujarnave();
     dibujarbala();
     
+    // ===== DIBUJAR ESTRELLAS =====
     float t = al_get_time(); // Tiempo actual para efectos de animación
 
     for (const auto& star : stars) {
