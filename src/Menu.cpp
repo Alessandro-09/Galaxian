@@ -103,7 +103,7 @@ void Menu::draw() const {
         ALLEGRO_COLOR normalColor = al_map_rgb(120, 150, 180);
 
         int x = width / 2;
-        int y = 200 + static_cast<int>(i) * 60;
+        int y = 250 + static_cast<int>(i) * 70;
 
         // Efecto de resplandor
         if (i == selectedOption) {
@@ -126,15 +126,15 @@ void Menu::draw() const {
         if (i == selectedOption) {
             float wingSize = 5.0f + 2.0f * std::sin(t * 3);
             al_draw_filled_triangle(
-                x - 80, y + 10,
-                x - 60 - wingSize, y + 10,
-                x - 70, y + 10 - wingSize,
+                x - 120, y + 10,  // Más separación horizontal
+                x - 90 - wingSize, y + 10,
+                x - 105, y + 10 - wingSize,
                 al_map_rgb(100, 180, 255)
             );
             al_draw_filled_triangle(
-                x + 80, y + 10,
-                x + 60 + wingSize, y + 10,
-                x + 70, y + 10 - wingSize,
+                x + 120, y + 10,  // Más separación horizontal
+                x + 90 + wingSize, y + 10,
+                x + 105, y + 10 - wingSize,
                 al_map_rgb(100, 180, 255)
             );
         }

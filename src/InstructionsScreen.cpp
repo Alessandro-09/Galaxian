@@ -131,14 +131,14 @@ void InstructionsScreen::draw() const {
     }
 
     // Constantes para posicionar los elementos en pantalla.
-    const int TITLE_Y = 80;                   // Posición del título
-    const int CONTROLS_Y = 250;               // Posición de los nombres de controles
-    const int KEY_Y = CONTROLS_Y + 50;        // Posición de las imágenes de teclas
+    const int TITLE_Y = 120;                   // Posición del título
+    const int CONTROLS_Y = 350;               // Posición de los nombres de controles
+    const int KEY_Y = CONTROLS_Y + 60;        // Posición de las imágenes de teclas
     const int KEY_IMG_HEIGHT = 90;            // Altura estándar para las imágenes
     //const int LOADING_Y = 520;              // Posición del mensaje de carga
-    const int COL1_X = 200;                   // Columna 1 (moverse)
-    const int COL2_X = 400;                   // Columna 2 (disparar)
-    const int COL3_X = 600;                   // Columna 3 (salir)
+    const int COL1_X = 320;                   // Columna 1 (moverse)
+    const int COL2_X = 640;                   // Columna 2 (disparar)
+    const int COL3_X = 960;                   // Columna 3 (salir)
 
     // Dibuja el título de la pantalla de instrucciones con un color azul claro.
     al_draw_text(font, al_map_rgb(100, 180, 255), COL2_X, TITLE_Y, ALLEGRO_ALIGN_CENTER, "HOW TO PLAY?");

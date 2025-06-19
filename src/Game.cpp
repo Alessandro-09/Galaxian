@@ -661,7 +661,7 @@ void Game::crearnave()
     nave->disparobitmap=al_load_bitmap("pictures/nave2.png"); //se carga imagen de disparo
     nave->alto=al_get_bitmap_height(nave->bitmap);            //se carga su ancho y alto segun imagen
     nave->ancho=al_get_bitmap_width(nave->bitmap);  
-    nave->x=800/2;                                            //se toma el tamaño de la pantalla y se divide en 2
+    nave->x=1280/2;                                            //se toma el tamaño de la pantalla y se divide en 2
     nave->y= height - 80;                                          //se carga posición en y
     nave->tiempo=0;                                           // se establece tiempo de refresco
     nave->vida=3;
@@ -673,7 +673,7 @@ void Game::dibujarnave() const
 void Game::actualizarNave(SystemResources& sys)
  {
 
-    if (nave->x + 30 > 800)//se mueve si no ha llegado al limite x
+    if (nave->x + 30 > width)//se mueve si no ha llegado al limite x
 		derecha = false;
 	if (nave->x < 0)
 		izquierda = false;

@@ -28,7 +28,7 @@ SystemResources initializeSystem(int width, int height, const char* fontPath, in
         return sys;
     }
 
-    // 3.1. Inicializar mixer de audio
+    // 3.1. Inicializar mixer de audiogit
     if (!al_reserve_samples(8)) {
         std::cerr << "Error al inicializar mixer de audio." << std::endl;
         return sys;
@@ -39,6 +39,23 @@ SystemResources initializeSystem(int width, int height, const char* fontPath, in
     if (!sys.display) {
         std::cerr << "Error al crear display." << std::endl;
         return sys;
+    }
+
+    // 4.1. Centrar la ventana en la pantalla
+    ALLEGRO_MONITOR_INFO monitor_info;
+    if (al_get_monitor_info(0, &monitor_info)) {
+        int screen_width = monitor_info.x2 - monitor_info.x1;
+        int screen_height = monitor_info.y2 - monitor_info.y1;
+        
+        int pos_x = (screen_width - width) / 2;
+        int pos_y = (screen_height - height) / 2;
+        
+        al_set_window_position(sys.display, pos_x, pos_y);
+    } else {
+        // Fallback: usar posición aproximada para pantalla 1920x1080
+        al_set_window_position(sys.display, 
+            (1920 - width) / 2, 
+            (1080 - height) / 2);
     }
 
     // 5. Cargar fuente
