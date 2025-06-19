@@ -12,6 +12,7 @@
 #include <algorithm>
 #include <random>
 #include <string>
+#include <cstdlib> 
 #include "HighScore.hpp"
 
 using namespace std;
@@ -50,6 +51,7 @@ typedef struct navesenemigas//se crea una estructura para los enemigos
     int estado;            //se crea atributo para el estado de movimiento con codigos 0,1,2,3,100,101,102 hay que agregar más estados usen codigos 
     int Disparo;
     double Tiempo;
+    int salio=0;
    navesenemigas* Siguiente; 
 }*ptr_est;
 
@@ -59,6 +61,7 @@ ptr_nave nave;            //lista que va a contener la nave
 void agregaralfinal(ptr_est& lista, ptr_est Nuevo)
 {
 	ptr_est Aux;//Puntero creado
+    Nuevo->salio=0;
 	Aux = lista;//Puntero apunta a la misma dirección que Lista
 	if (Aux != NULL)//si la lista no esta vacia
 	{
@@ -91,6 +94,43 @@ void agregarBala(ptr_bala& lista, ptr_bala Nuevo)
 	{
 		lista = Nuevo;//Lista apunta al nuevo elemento
 	}
+}
+void limpiarenemigos() // se encarga de limpiar la cola de enemigos
+{
+    ptr_est aux = enemigos;
+    while (aux != nullptr)
+    {
+        ptr_est temp = aux;
+        aux = aux->Siguiente;
+        delete temp;
+    }
+    enemigos = nullptr; // Importante para evitar punteros colgantes
+}
+void limpiarbalas()
+{
+    ptr_bala aux = Balas;
+    while (aux != nullptr)
+    {
+        ptr_bala temp = aux;
+        aux = aux->siguiente;
+        delete temp;
+    }
+    Balas = nullptr; // Importante para evitar punteros colgantes
+}
+
+
+bool puedeAtacar(ptr_est e) {
+    ptr_est aux = enemigos;
+
+    while (aux != nullptr) {
+        if (aux != e &&
+        aux->x < e->x + 30 && aux->x + 30 > e->x && // colisión horizontal
+        aux->fila > e->fila) 
+            return false; // Hay alguien debajo
+        aux = aux->Siguiente;
+    }
+
+    return true; // Nadie debajo, puede atacar
 }
 
 Game::Game(ALLEGRO_FONT* font, int width, int height) 
@@ -206,6 +246,7 @@ void Game::crearnivel() //para creación de nivel
                 nuevo->Siguiente=nullptr;
                 nuevo->Disparo=1;
                 nuevo->Tiempo=0;
+                nuevo->salio=0;
                 agregaralfinal(enemigos, nuevo);    //se pasa par agregar a la lista
                 x+=40;
             }
@@ -258,7 +299,7 @@ void Game::crearnivel() //para creación de nivel
                 nuevo->estado=0;                    //se pone estadode no movimiento
                 nuevo->Siguiente=nullptr;
                 nuevo->Disparo=1;
-                nuevo->Tiempo=0;
+                nuevo->Tiempo=0; 
                 agregaralfinal(enemigos, nuevo);    //se pasa par agregar a la lista
                 x+=40;
             }
@@ -560,8 +601,18 @@ void Game::actualizarenemigos(SystemResources& sys)
             switch (enemigo->estado) 
             {
                 case 100: // Salida inicial (baja hasta y = 340)
+                {
+                    float n=0;
+                    if(nivel>3)
+                    {
+                        n=2;
+                    }
+                    else
+                    {
+                        n=nivel/2;
+                    }
                     if (fabs(enemigo->y - 340.0f) > 1.0f)
-                        enemigo->y += 0.5f * ((340.0f > enemigo->y) ? 1 : -1);
+                        enemigo->y += 0.5f * ((340.0f > enemigo->y) ? 1+n : -2-n);
 
                     // Llegó al punto de ataque
                     if (fabs(enemigo->y - 340.0f) <= 1.0f) {
@@ -575,11 +626,12 @@ void Game::actualizarenemigos(SystemResources& sys)
                         enemigo->dx *= -1; // Cambia de dirección
                     }
                     break;
-
+                }
                 case 101: // Descenso hacia nave->x
                 {
                     bool colisionaConOtro = false;
                     ptr_est otro = enemigos;
+
                     while (otro != nullptr) {
                         if (otro != enemigo && 
                             !(enemigo->x + 30 < otro->x || enemigo->x > otro->x + 30 ||
@@ -589,38 +641,70 @@ void Game::actualizarenemigos(SystemResources& sys)
                         }
                         otro = otro->Siguiente;
                     }
-                    if(enemigo->y>400 && enemigo->Disparo!=0 && al_get_time()- enemigo->Tiempo>=2)
-                        {
-                            enemigo->Disparo-=1;
-                            enemigo->Tiempo=al_get_time();
-                            crearbala(-3, enemigo->x + 15, enemigo->y + 50, sys); // Dispara bala
-                        }
-                    if (!colisionaConOtro)
-                         enemigo->y += 1.2f; // Solo se mueve si no colisiona
 
-                    if (fabs(enemigo->x - nave->x) > 1.0f)
-                        enemigo->x += 0.7f * ((nave->x > enemigo->x) ? 1 : -1);
-
-                    if (enemigo->y >= nave->y) {
-                        enemigo->estado = 102;
+                    // Disparo si condiciones se cumplen
+                    if (enemigo->y > 340 && enemigo->Disparo != 0 && al_get_time() - enemigo->Tiempo >= 2 && puedeAtacar(enemigo)) {
+                        enemigo->Disparo -= 1;
+                        enemigo->Tiempo = al_get_time();
+                        crearbala(-3, enemigo->x + 15, enemigo->y + 50, sys); // Dispara bala
                     }
+
+                    // Movimiento vertical si no colisiona
+                    float n=0;
+                    if(nivel>3)
+                    {
+                        n=2;
+                    }
+                    else
+                    {
+                        n=nivel/2;
+                    }
+                    if (!colisionaConOtro)
+                        enemigo->y += 1+n;
+
+                    // Movimiento horizontal evitando colisión
+                    bool puedeMoverX = true;
+                    otro = enemigos;
+                    int nuevoX = enemigo->x + ((nave->x > enemigo->x) ? 1+n : -1-n);
+
+                    while (otro != nullptr) {
+                        if (otro != enemigo &&
+                            nuevoX < otro->x + 30 && nuevoX + 30 > otro->x &&
+                            enemigo->y < otro->y + 30 && enemigo->y + 30 > otro->y) {
+                            puedeMoverX = false;
+                            break;
+                        }
+                        otro = otro->Siguiente;
+                    }
+
+                    if (puedeMoverX)
+                        enemigo->x = nuevoX;
+
+                    // Chequeo final
+                    if (enemigo->y >= nave->y)
+                        enemigo->estado = 102;
+
                     break;
                 }
                 case 102: // modificar por aparición de arriba a origen 
-                    ptr_est borrar = enemigo;
-                    ptr_est anterior = enemigos;
+                    if (enemigo->y<720) 
+                {
+                    // Reaparecer desde un costado
+                    if (enemigo->x < 640)
+                        enemigo->x = -30;         // Reaparece por la izquierda con algo de variación
+                    else
+                        enemigo->x = 1310;   // Reaparece por la derecha (pantalla 800px, enemigo ~30px ancho)
 
-                    if (borrar == enemigos) {
-                        enemigos = borrar->Siguiente;
-                    } else {
-                        while (anterior && anterior->Siguiente != borrar)
-                            anterior = anterior->Siguiente;
-                        if (anterior) anterior->Siguiente = borrar->Siguiente;
-                    }
+                    enemigo->y = 100;                      // Posición vertical fija
 
-                    enemigo = borrar->Siguiente;
-                    delete borrar;
-                    continue;
+                    // Restaurar parámetros del enemigo
+                    enemigo->estado = 101;
+                    enemigo->Tiempo = al_get_time();
+                    enemigo->Disparo = 3;                 // Si querés reiniciar el número de disparos, opcional
+
+                    // No se elimina; se recicla
+                }
+
             }
     }
 
@@ -628,30 +712,6 @@ void Game::actualizarenemigos(SystemResources& sys)
     }
 }
 
-void limpiarenemigos() // se encarga de limpiar la cola de enemigos
-{
-    ptr_est aux = enemigos;
-    while (aux != nullptr)
-    {
-        ptr_est temp = aux;
-        aux = aux->Siguiente;
-        delete temp;
-    }
-    enemigos = nullptr; // Importante para evitar punteros colgantes
-}
-
-
-bool puedeAtacar(ptr_est e) {
-    ptr_est aux = enemigos;
-
-    while (aux != nullptr) {
-        if (aux != e && aux->col == e->col && aux->fila > e->fila)
-            return false; // Hay alguien debajo
-        aux = aux->Siguiente;
-    }
-
-    return true; // Nadie debajo, puede atacar
-}
 
 
 void Game::crearnave()
@@ -661,7 +721,7 @@ void Game::crearnave()
     nave->disparobitmap=al_load_bitmap("pictures/nave2.png"); //se carga imagen de disparo
     nave->alto=al_get_bitmap_height(nave->bitmap);            //se carga su ancho y alto segun imagen
     nave->ancho=al_get_bitmap_width(nave->bitmap);  
-    nave->x=1280/2;                                            //se toma el tamaño de la pantalla y se divide en 2
+    nave->x=800/2;                                            //se toma el tamaño de la pantalla y se divide en 2
     nave->y= height - 80;                                          //se carga posición en y
     nave->tiempo=0;                                           // se establece tiempo de refresco
     nave->vida=3;
@@ -673,7 +733,7 @@ void Game::dibujarnave() const
 void Game::actualizarNave(SystemResources& sys)
  {
 
-    if (nave->x + 30 > width)//se mueve si no ha llegado al limite x
+    if (nave->x + 30 > 800)//se mueve si no ha llegado al limite x
 		derecha = false;
 	if (nave->x < 0)
 		izquierda = false;
@@ -718,7 +778,8 @@ void Game::actualizarbala(SystemResources& sys)
         if (aux->y <= 0) {
             ptr_bala eliminar = aux;
 
-            if (anterior == nullptr) {
+            if (anterior == nullptr) 
+            {
                 //esa la primera entonces paselo a balas
                 Balas = aux->siguiente;
                 aux = Balas;
