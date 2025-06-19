@@ -649,7 +649,7 @@ void Game::crearnave()
     nave->alto=al_get_bitmap_height(nave->bitmap);            //se carga su ancho y alto segun imagen
     nave->ancho=al_get_bitmap_width(nave->bitmap);  
     nave->x=800/2;                                            //se toma el tamaño de la pantalla y se divide en 2
-    nave->y= 550;                                             //se carga posición en y
+    nave->y= height - 80;                                          //se carga posición en y
     nave->tiempo=0;                                           // se establece tiempo de refresco
     nave->vida=3;
 }
@@ -798,48 +798,43 @@ void Game::update(SystemResources& sys) {
 void Game::draw() const {
     al_clear_to_color(al_map_rgb(5, 2, 10)); // Fondo oscuro del espacio
     
-    // ===== PUNTAJES EN LA PARTE SUPERIOR (CON FUENTE PEQUEÑA) =====
+    // Puntaje en la parte superior
     std::string scoreText = "SCORE: " + std::to_string(currentScore);
     std::string highScoreText = "HIGH SCORE: " + std::to_string(highScore);
     
-    // Puntaje actual (izquierda, fuente pequeña)
-    al_draw_text(smallFont, al_map_rgb(255, 255, 255), 10, 5, 
+    // Puntaje actual (izquierda, fuente normal, blanco)
+    al_draw_text(font, al_map_rgb(255, 255, 255), 20, 10, 
                  ALLEGRO_ALIGN_LEFT, scoreText.c_str());
     
-    // High score (derecha, fuente pequeña)
-    al_draw_text(smallFont, al_map_rgb(255, 255, 0), width - 10, 5, 
+    // High score (derecha, fuente normal, ROJO)
+    al_draw_text(font, al_map_rgb(255, 0, 0), width - 20, 10, 
                  ALLEGRO_ALIGN_RIGHT, highScoreText.c_str());
     
-    // ===== VIDAS COMO NAVES EN LA PARTE INFERIOR IZQUIERDA =====
-    // Posición base para las vidas
-    int livesX = 20;          // Posición X inicial
-    int livesY = height - 50; // Posición Y (cerca del fondo)
-    int spacing = 35;         // Espacio entre cada nave
+    // Vidas como naves 
+    int bannerHeight = 40;                    // Altura del banner
+    int bannerY = height - bannerHeight;      // Posición Y del banner
     
-    // Dibujar tantas naves como vidas tenga el jugador
+    // Fondo del banner (negro semi-transparente)
+    al_draw_filled_rectangle(0, bannerY, width, height, 
+                           al_map_rgba(0, 0, 0, 200)); // Negro con transparencia
+    
+    
+    // Vidas como naves dentro del banner
+    int livesX = 30;                          // Margen izquierdo
+    int livesY = bannerY + 8;                 // Centrado en el banner
+    int spacing = 35;                         // Espacio entre naves
+    
+    // Dibujar las naves de vida
     for (int i = 0; i < nave->vida; ++i) {
-        // Dibujar la imagen de la nave (usando el bitmap de disparo para que se vea diferente)
-        if (nave->disparobitmap) {
-            al_draw_scaled_bitmap(nave->disparobitmap, 
-                                0, 0, 
-                                nave->ancho, nave->alto,
-                                livesX + (i * spacing), livesY, 
-                                25, 25, // Tamaño pequeño para las vidas
-                                0);
-        } else if (nave->bitmap) {
-            // Si no hay bitmap de disparo, usar el normal
+        if (nave->bitmap) {
             al_draw_scaled_bitmap(nave->bitmap, 
                                 0, 0, 
                                 nave->ancho, nave->alto,
                                 livesX + (i * spacing), livesY, 
-                                25, 25, // Tamaño pequeño para las vidas
+                                22, 22, // Tamaño pequeño
                                 0);
         }
     }
-    
-    // Texto "LIVES:" antes de las naves
-    al_draw_text(smallFont, al_map_rgb(255, 100, 100), livesX, livesY - 25, 
-                 ALLEGRO_ALIGN_LEFT, "LIVES:");
     
     // ===== DIBUJAR ELEMENTOS DEL JUEGO =====
     dibujarenemigos();
