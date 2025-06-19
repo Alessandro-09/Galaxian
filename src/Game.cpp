@@ -94,11 +94,12 @@ void agregarBala(ptr_bala& lista, ptr_bala Nuevo)
 
 Game::Game(ALLEGRO_FONT* font, int width, int height) 
     : font(font), width(width), height(height), 
-      starSpeed(1.0f), speedMultiplier(1.0f), elapsedTime(0.0f) {  // Velocidad inicial 1.0
-    crearnivel(); // se llama a las funcuones para empezar
+      starSpeed(1.0f), speedMultiplier(1.0f), elapsedTime(0.0f) {
+    crearnivel();
     crearnave();
     generateStars();
 }
+
 void Game::dibujarenemigos() const
 {
     ptr_est aux = enemigos;
@@ -340,7 +341,7 @@ void Game::crearnivel() //para creación de nivel
     
 }
 
-void Game::colisiones()                        //encargada de ciertas colisiones
+void Game::colisiones(SystemResources& sys)                        //encargada de ciertas colisiones
 {
     ptr_bala aux=Balas;                        //puntero que apunta a lo mismo que la lista
     ptr_bala aux2=nullptr;                     //puntero auxiliar
@@ -356,6 +357,12 @@ void Game::colisiones()                        //encargada de ciertas colisiones
             if (!(aux->x + 30 < enemigo->x || aux->x > enemigo->x + 30 ||
                   aux->y + 30 < enemigo->y || aux->y > enemigo->y + 30))//todo negado se calcula segun lo siguiente si la bala se encuentra entre su posición +30  y si el enemigo más 30 es mayor
             {
+                // Reproducir sonido de impacto
+                if (sys.hitEnemySound) {
+                    al_play_sample(sys.hitEnemySound, 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, nullptr);
+                    std::cout << "Reproduciendo sonido de impacto\n";
+                }
+                
                 // Eliminar enemigo
                 if (enemigo2 == nullptr)// se toma si el auxiliar esta en blanco
                     enemigos = enemigo->Siguiente;// entonces la lista pasa al siguiente
@@ -446,7 +453,7 @@ void Game::colisiones()                        //encargada de ciertas colisiones
 
 
 }
-void Game::actualizarenemigos()
+void Game::actualizarenemigos(SystemResources& sys)
 {
     ptr_est enemigo = enemigos;
     float velocidad = 0.15f;//se pone velocidad
@@ -535,7 +542,7 @@ void Game::actualizarenemigos()
                         {
                             enemigo->Disparo-=1;
                             enemigo->Tiempo=al_get_time();
-                            crearbala(-3, enemigo->x + 15, enemigo->y + 50); // Dispara bala
+                            crearbala(-3, enemigo->x + 15, enemigo->y + 50, sys); // Dispara bala
                         }
                     if (!colisionaConOtro)
                          enemigo->y += 1.2f; // Solo se mueve si no colisiona
@@ -612,7 +619,7 @@ void Game::dibujarnave() const
 {
      al_draw_scaled_bitmap(nave->bitmap, 0, 0, nave->ancho, nave->alto,nave->x, nave->y,30, 30,0);//se dibuja reescalada la nave
 }
-void Game::actualizarNave()
+void Game::actualizarNave(SystemResources& sys)
  {
 
     if (nave->x + 30 > 800)//se mueve si no ha llegado al limite x
@@ -625,16 +632,19 @@ void Game::actualizarNave()
 		nave->x -= 4;
 }
 
-void Game::crearbala(int dy, int x, int y)
-{
-    ptr_bala nueva=new Bala();
-    nueva->x=x;
-    nueva->y=y;
-    nueva->velocidad=dy;
-    nueva->siguiente=nullptr;
-    agregarBala(Balas,nueva);
+void Game::crearbala(int dy, int x, int y, SystemResources& sys) {
+    ptr_bala nueva = new Bala();
+    nueva->x = x;
+    nueva->y = y;
+    nueva->velocidad = dy;
+    nueva->siguiente = nullptr;
+    agregarBala(Balas, nueva);
 
+    if (sys.shootSound) {
+        al_play_sample(sys.shootSound, 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, nullptr);
+    }
 }
+
 void Game::dibujarbala() const
 {
     ptr_bala aux = Balas;
@@ -645,7 +655,7 @@ void Game::dibujarbala() const
     }
 }
 
-void Game::actualizarbala()
+void Game::actualizarbala(SystemResources& sys)
 {
     ptr_bala aux = Balas;
     ptr_bala anterior = nullptr;
@@ -687,7 +697,7 @@ void Game::generateStars() {
     }
 }
 
-void Game::update() {
+void Game::update(SystemResources& sys) {
     // Aumentar el tiempo transcurrido 
     elapsedTime += 1.0f/120.0f; // 120 FPS
     
@@ -741,10 +751,10 @@ void Game::update() {
         crearnivel();
         tiempoUltimoAtaque = al_get_time();
     }
-    actualizarenemigos();
-    colisiones();
-    actualizarNave();
-    actualizarbala();
+    actualizarenemigos(sys);
+    colisiones(sys);
+    actualizarNave(sys);
+    actualizarbala(sys);
 }
 
 void Game::draw() const {
@@ -788,14 +798,6 @@ void Game::draw() const {
 int Game::run(SystemResources& sys) {
     ALLEGRO_EVENT event;
     bool running = true;
-
-    // Detener cualquier música que esté sonando al entrar al juego
-    if (sys.menuMusic && al_get_audio_stream_playing(sys.menuMusic)) {
-        al_set_audio_stream_playing(sys.menuMusic, false);
-    }
-    if (sys.instructionsMusic && al_get_audio_stream_playing(sys.instructionsMusic)) {
-        al_set_audio_stream_playing(sys.instructionsMusic, false);
-    }
 
     al_start_timer(sys.timer);
 
@@ -841,7 +843,7 @@ int Game::run(SystemResources& sys) {
             {
                 nave->bitmap = nave->disparobitmap;
                 nave->tiempo = al_get_time(); // guardar tiempo del cambio
-                crearbala(3, nave->x+15, nave->y-30);
+                crearbala(3, nave->x+15, nave->y-30, sys);
             }
         }
         if(nave->vida<=0)
@@ -851,7 +853,7 @@ int Game::run(SystemResources& sys) {
 
         }
         else if (event.type == ALLEGRO_EVENT_TIMER) {
-            update();
+            update(sys);
             draw();
         }
         

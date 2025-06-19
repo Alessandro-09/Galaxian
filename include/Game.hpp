@@ -40,14 +40,14 @@ private:
 
     std::vector<Star> stars;
     void crearnivel();
-    void crearbala(int dy, int x, int y);
-    void colisiones();
-    void actualizarenemigos();
-    void actualizarbala();
-    void actualizarNave();
+    void crearbala(int dy, int x, int y, SystemResources& sys);
+    void colisiones(SystemResources& sys);
+    void actualizarenemigos(SystemResources& sys);
+    void actualizarbala(SystemResources& sys);
+    void actualizarNave(SystemResources& sys);
     void crearnave();
     void generateStars();
-    void update();
+    void update(SystemResources& sys);
     float starSpeed;
     float speedMultiplier; 
     float elapsedTime;  

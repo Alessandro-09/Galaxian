@@ -29,7 +29,7 @@ SystemResources initializeSystem(int width, int height, const char* fontPath, in
     }
 
     // 3.1. Inicializar mixer de audio
-    if (!al_reserve_samples(1)) {
+    if (!al_reserve_samples(8)) {
         std::cerr << "Error al inicializar mixer de audio." << std::endl;
         return sys;
     }
@@ -89,8 +89,8 @@ SystemResources initializeSystem(int width, int height, const char* fontPath, in
     }
 
     if (!sys.hitEnemySound) {
-        std::cerr << "Error al cargar hit_enemy.ogg" << std::endl;
-    }
+        std::cerr << "Error: No se pudo cargar hit_enemy.ogg. Ruta: " << al_get_current_directory() << std::endl;
+    } 
 
     // 8. Registrar fuentes de eventos
     al_register_event_source(sys.eventQueue, al_get_display_event_source(sys.display));
