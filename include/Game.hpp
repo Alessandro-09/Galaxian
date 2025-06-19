@@ -43,6 +43,14 @@ private:
     int currentScore;
     int highScore;
 
+    // Variables para Game Over y explosión
+    bool gameOver;
+    bool showExplosion;
+    float explosionTimer;
+    float gameOverTimer;
+    ALLEGRO_BITMAP* explosionImg;
+    ALLEGRO_BITMAP* livesSprite;
+
     std::vector<Star> stars;
     void crearnivel();
     void crearbala(int dy, int x, int y, SystemResources& sys);

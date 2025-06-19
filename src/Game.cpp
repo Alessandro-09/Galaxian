@@ -105,6 +105,10 @@ Game::Game(ALLEGRO_FONT* font, int width, int height)
         smallFont = font;
     }
 
+    // Cargar sprite específico para las vidas (siempre nave1.png)
+    livesSprite = al_load_bitmap("pictures/nave1.png");
+
+
     crearnivel();
     crearnave();
     generateStars();
@@ -121,6 +125,15 @@ Game::~Game() {
     // Liberar la fuente pequeña solo si es diferente de la principal
     if (smallFont && smallFont != font) {
         al_destroy_font(smallFont);
+    }
+    // Liberar imagen de explosión
+    if (explosionImg) {
+        al_destroy_bitmap(explosionImg);
+    }
+    
+    // Liberar sprite de vidas
+    if (livesSprite) {
+        al_destroy_bitmap(livesSprite);
     }
 }
 
@@ -826,10 +839,11 @@ void Game::draw() const {
     
     // Dibujar las naves de vida
     for (int i = 0; i < nave->vida; ++i) {
-        if (nave->bitmap) {
-            al_draw_scaled_bitmap(nave->bitmap, 
+        if (livesSprite) {
+            al_draw_scaled_bitmap(livesSprite, 
                                 0, 0, 
-                                nave->ancho, nave->alto,
+                                al_get_bitmap_width(livesSprite), 
+                                al_get_bitmap_height(livesSprite),
                                 livesX + (i * spacing), livesY, 
                                 22, 22, // Tamaño pequeño
                                 0);
