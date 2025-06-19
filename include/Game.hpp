@@ -28,15 +28,20 @@ struct Star {
 class Game {
 public:
     Game(ALLEGRO_FONT* font, int width, int height);
+    ~Game(); 
     int run(SystemResources& sys);
     void draw() const;
     void dibujarenemigos() const;
     void dibujarnave() const;
     void dibujarbala() const;
+    int getCurrentScore() const;
 
 private:
     ALLEGRO_FONT* font;
+    ALLEGRO_FONT* smallFont;
     int width, height;
+    int currentScore;
+    int highScore;
 
     std::vector<Star> stars;
     void crearnivel();

@@ -12,6 +12,7 @@
 #include <algorithm>
 #include <random>
 #include <string>
+#include "HighScore.hpp"
 
 using namespace std;
 int nivel=1; //variable para nivel
@@ -94,10 +95,33 @@ void agregarBala(ptr_bala& lista, ptr_bala Nuevo)
 
 Game::Game(ALLEGRO_FONT* font, int width, int height) 
     : font(font), width(width), height(height), 
+      currentScore(0), highScore(0),
       starSpeed(1.0f), speedMultiplier(1.0f), elapsedTime(0.0f) {
+
+    // Crear fuente pequeña para puntajes 
+    smallFont = al_load_ttf_font("assets/space_font.ttf", 18, 0);
+    if (!smallFont) {
+    // Si no se puede cargar, usar la fuente normal
+        smallFont = font;
+    }
+
     crearnivel();
     crearnave();
     generateStars();
+    
+    // Cargar high score
+    HighScore hs(font, width, height);
+    auto topScores = hs.getTopScores(1);
+    if (!topScores.empty()) {
+        highScore = topScores[0].score;
+    }
+}
+
+Game::~Game() {
+    // Liberar la fuente pequeña solo si es diferente de la principal
+    if (smallFont && smallFont != font) {
+        al_destroy_font(smallFont);
+    }
 }
 
 void Game::dibujarenemigos() const
@@ -357,6 +381,13 @@ void Game::colisiones(SystemResources& sys)                        //encargada d
             if (!(aux->x + 30 < enemigo->x || aux->x > enemigo->x + 30 ||
                   aux->y + 30 < enemigo->y || aux->y > enemigo->y + 30))//todo negado se calcula segun lo siguiente si la bala se encuentra entre su posición +30  y si el enemigo más 30 es mayor
             {
+                // Agregar puntos según el tipo de enemigo
+                if (enemigo->fila == 0) currentScore += 100;      //Primera fila: 100 puntos
+                else if (enemigo->fila == 1) currentScore += 75;  //Segunda fila: 75 puntos
+                else if (enemigo->fila == 2) currentScore += 50;  //Tercera fila: 50 puntos
+                else currentScore += 25;                           //Otras filas: 25 puntos
+
+
                 // Reproducir sonido de impacto
                 if (sys.hitEnemySound) {
                     al_play_sample(sys.hitEnemySound, 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, nullptr);
@@ -766,9 +797,28 @@ void Game::update(SystemResources& sys) {
 
 void Game::draw() const {
     al_clear_to_color(al_map_rgb(5, 2, 10)); // Fondo oscuro del espacio
+    
+    // Dibujar puntajes en la parte superior
+    std::string scoreText = "SCORE: " + std::to_string(currentScore);
+    std::string highScoreText = "HIGH SCORE: " + std::to_string(highScore);
+    
+    // Puntaje actual (izquierda)
+    al_draw_text(font, al_map_rgb(255, 255, 255), 20, 10, 
+                 ALLEGRO_ALIGN_LEFT, scoreText.c_str());
+    
+    // High score (derecha)
+    al_draw_text(font, al_map_rgb(255, 255, 0), width - 20, 10, 
+                 ALLEGRO_ALIGN_RIGHT, highScoreText.c_str());
+    
+    // Vidas restantes (centro)
+    std::string livesText = "LIVES: " + std::to_string(nave->vida);
+    al_draw_text(font, al_map_rgb(255, 100, 100), width/2, 10, 
+                 ALLEGRO_ALIGN_CENTER, livesText.c_str());
+    
     dibujarenemigos();
     dibujarnave();
     dibujarbala();
+    
     float t = al_get_time(); // Tiempo actual para efectos de animación
 
     for (const auto& star : stars) {
@@ -868,4 +918,8 @@ int Game::run(SystemResources& sys) {
     }
 
     return 0;
+}
+
+int Game::getCurrentScore() const {
+    return currentScore;
 }

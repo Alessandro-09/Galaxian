@@ -50,7 +50,7 @@ SystemResources initializeSystem(int width, int height, const char* fontPath, in
     }
 
     // 6. Configurar timer y event queue
-    sys.timer = al_create_timer(1.0 / 120.0); // 120 FPS
+    sys.timer = al_create_timer(1.0 / 60.0); // 120 FPS
     sys.eventQueue = al_create_event_queue();
     if (!sys.timer || !sys.eventQueue) {
         std::cerr << "Error al crear timer o event queue." << std::endl;

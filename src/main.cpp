@@ -4,6 +4,7 @@
 #include "InstructionsScreen.hpp"
 #include <allegro5/allegro_image.h>
 #include <iostream>
+#include "HighScore.hpp"
 
 #define SCREEN_WIDTH 800
 #define SCREEN_HEIGHT 600
@@ -62,19 +63,24 @@ int main() {
                     Game game(sys.font, SCREEN_WIDTH, SCREEN_HEIGHT);
                     game.run(sys);
                     
+                    // Guardar puntaje al terminar el juego
+                    int finalScore = game.getCurrentScore();
+                    if (finalScore > 0) {
+                        HighScore highScore(sys.font, SCREEN_WIDTH, SCREEN_HEIGHT);
+                        highScore.addScore(finalScore);
+                        std::cout << "Puntaje guardado: " << finalScore << std::endl;
+                    }
+                    
                     // Reanudar solo la música del menú al volver
                     if (sys.menuMusic) al_set_audio_stream_playing(sys.menuMusic, true);
                 }
                 break;
             }
-            case 1:  // High Scores
-                std::cout << "Mostrando puntuaciones...\n";
-
-
-                // Lógica de puntuaciones
-
-
+            case 1: {  // High Scores
+                HighScore highScore(sys.font, SCREEN_WIDTH, SCREEN_HEIGHT);
+                highScore.run(sys);
                 break;
+            }
             case 2:  // Exit
                 running = false;
                 break;
