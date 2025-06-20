@@ -1110,6 +1110,7 @@ void Game::update(SystemResources& sys) {
     if(enemigos==nullptr)
     {
         nivel++;
+        limpiarbalas();
         crearnivel();
         tiempoUltimoAtaque = al_get_time();
     }
@@ -1232,13 +1233,19 @@ int Game::run(SystemResources& sys) {
             }
     	}
         if (event.type == ALLEGRO_EVENT_DISPLAY_CLOSE) {
-            running = false;
+            limpiarbalas();
             limpiarenemigos();
+            nivel=0;
+            running = false;
+            
         } 
         else if (event.type == ALLEGRO_EVENT_KEY_DOWN) {
             if (event.keyboard.keycode == ALLEGRO_KEY_ESCAPE) {
-                running = false;
+                limpiarbalas();
                 limpiarenemigos();
+                nivel=0;
+                running = false;
+                
             }
         } 
         
@@ -1253,9 +1260,11 @@ int Game::run(SystemResources& sys) {
         }
         if(nave->vida<=0)
         {
-            running=false;
+            limpiarbalas();
             limpiarenemigos();
-
+            nivel=0;
+            running=false;
+            
         }
         else if (event.type == ALLEGRO_EVENT_TIMER) {
             update(sys);
