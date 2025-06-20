@@ -130,15 +130,17 @@ void InstructionsScreen::draw() const {
         }
     }
 
-    // Constantes para posicionar los elementos en pantalla.
-    const int TITLE_Y = 120;                   // Posición del título
-    const int CONTROLS_Y = 350;               // Posición de los nombres de controles
-    const int KEY_Y = CONTROLS_Y + 60;        // Posición de las imágenes de teclas
-    const int KEY_IMG_HEIGHT = 90;            // Altura estándar para las imágenes
-    //const int LOADING_Y = 520;              // Posición del mensaje de carga
-    const int COL1_X = 320;                   // Columna 1 (moverse)
-    const int COL2_X = 640;                   // Columna 2 (disparar)
-    const int COL3_X = 960;                   // Columna 3 (salir)
+    // CONSTANTES AJUSTADAS PARA PANTALLA 900x640
+    const int TITLE_Y = 60;                    // Título más arriba
+    const int CONTROLS_Y = 220;                // Nombres de controles
+    const int KEY_Y = CONTROLS_Y + 60;         // Imágenes de teclas
+    const int KEY_IMG_HEIGHT = 70;             // Imágenes ajustadas
+    const int MESSAGE_Y = 500;                 // Mensaje final
+
+    // COLUMNAS CENTRADAS PARA PANTALLA 900px
+    const int COL1_X = 200;                    // Moverse (izquierda)
+    const int COL2_X = 450;                    // Disparar (centro exacto: 900/2)
+    const int COL3_X = 700;                    // Salir (derecha)
 
     // Dibuja el título de la pantalla de instrucciones con un color azul claro.
     al_draw_text(font, al_map_rgb(100, 180, 255), COL2_X, TITLE_Y, ALLEGRO_ALIGN_CENTER, "HOW TO PLAY?");
@@ -185,11 +187,11 @@ void InstructionsScreen::draw() const {
         );
         
         // Texto con sombra negra
-        al_draw_text(font, al_map_rgb(0, 0, 0), width/2 + 2, 522, ALLEGRO_ALIGN_CENTER, message);
+        al_draw_text(font, al_map_rgb(0, 0, 0), width/2 + 2, MESSAGE_Y + 2, ALLEGRO_ALIGN_CENTER, message);
         // Texto principal pulsante
-        al_draw_text(font, pulseColor, width/2, 520, ALLEGRO_ALIGN_CENTER, message);
+        al_draw_text(font, pulseColor, width/2, MESSAGE_Y, ALLEGRO_ALIGN_CENTER, message);
     } else {
-        al_draw_text(font, al_map_rgb(200, 200, 200), width/2, 520, ALLEGRO_ALIGN_CENTER, message);
+        al_draw_text(font, al_map_rgb(200, 200, 200), width/2, MESSAGE_Y, ALLEGRO_ALIGN_CENTER, message);
     }
 
     al_flip_display();
