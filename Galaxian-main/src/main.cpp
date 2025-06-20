@@ -55,29 +55,29 @@ int main() {
 
         switch (option) {
             case 0: {  // Start Game
-    InstructionsScreen instructions(sys.font, SCREEN_WIDTH, SCREEN_HEIGHT);
-    if (instructions.run(sys)) {
-        if (sys.menuMusic) al_set_audio_stream_playing(sys.menuMusic, false);
-        if (sys.instructionsMusic) al_set_audio_stream_playing(sys.instructionsMusic, false);
+                InstructionsScreen instructions(sys.font, SCREEN_WIDTH, SCREEN_HEIGHT);
+                if (instructions.run(sys)) {
+                    if (sys.menuMusic) al_set_audio_stream_playing(sys.menuMusic, false);
+                    if (sys.instructionsMusic) al_set_audio_stream_playing(sys.instructionsMusic, false);
 
-        Game game(sys.font, SCREEN_WIDTH, SCREEN_HEIGHT);
-        game.run(sys);
+                    Game game(sys.font, SCREEN_WIDTH, SCREEN_HEIGHT);
+                    game.run(sys);
 
-        int finalScore = game.getCurrentScore();
+                    int finalScore = game.getCurrentScore();
 
-        std::string playerName = "---";
-        GameOverScreen gameOver(sys.font, SCREEN_WIDTH, SCREEN_HEIGHT);
-        playerName = gameOver.show(sys, finalScore);
+                    std::string playerName = "---";
+                    GameOverScreen gameOver(sys.font, SCREEN_WIDTH, SCREEN_HEIGHT);
+                    std::string playerName = gameOver.show(sys, finalScore);
 
-        if (finalScore > 0 && playerName.length() == 3) {
-            HighScore highScore(sys.font, SCREEN_WIDTH, SCREEN_HEIGHT);
-            highScore.addScore(finalScore, playerName); // ✅ ORDEN CORRECTO: (score, name)
-            std::cout << "Puntaje guardado: " << finalScore << " (" << playerName << ")" << std::endl;
-        }
+                    if (finalScore > 0 && playerName.length() == 3) {
+                        HighScore highScore(sys.font, SCREEN_WIDTH, SCREEN_HEIGHT);
+                        highScore.addScore(finalScore, playerName);
+                        std::cout << "Puntaje guardado: " << finalScore << " (" << playerName << ")" << std::endl;
+                    }
 
-        if (sys.menuMusic) al_set_audio_stream_playing(sys.menuMusic, true);
-    }
-    break;
+                    if (sys.menuMusic) al_set_audio_stream_playing(sys.menuMusic, true);
+                }
+                break;
 }
             case 1: {  // High Scores
                 HighScore highScore(sys.font, SCREEN_WIDTH, SCREEN_HEIGHT);

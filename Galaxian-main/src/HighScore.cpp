@@ -6,7 +6,6 @@
 #include <cmath>
 #include <iostream>
 #include <cstdlib>
-#include <sstream>
 
 const std::string HighScore::SCORES_FILE = "highscores.txt";
 
@@ -37,8 +36,18 @@ void HighScore::updateStars() {
     }
 }
 
+std::string HighScore::getCurrentDate() {
+    std::time_t now = std::time(nullptr);
+    char* dt = std::ctime(&now);
+    std::string date(dt);
+    if (!date.empty() && date[date.length() - 1] == '\n') {
+        date.erase(date.length() - 1);
+    }
+    return date;
+}
+
 void HighScore::addScore(int score, const std::string& name) {
-    scores.emplace_back(score, name);
+    scores.emplace_back(score, getCurrentDate(), name);
 
     std::sort(scores.begin(), scores.end(), [](const ScoreEntry& a, const ScoreEntry& b) {
         return a.score > b.score;
@@ -56,15 +65,16 @@ void HighScore::loadScores() {
     std::ifstream file(SCORES_FILE);
 
     if (file.is_open()) {
-        std::string line;
-        while (std::getline(file, line)) {
-            std::istringstream iss(line);
-            std::string name;
-            int score;
-            if (iss >> name >> score) {
-                scores.emplace_back(score, name);
-            }
+        int score;
+        std::string date, name;
+
+        while (file >> score) {
+            file.ignore();
+            std::getline(file, date, ' ');
+            std::getline(file, name);
+            scores.emplace_back(score, date, name);
         }
+
         file.close();
     }
 
@@ -78,8 +88,9 @@ void HighScore::saveScores() {
 
     if (file.is_open()) {
         for (const auto& entry : scores) {
-            file << entry.name << " " << entry.score << std::endl;
+            file << entry.score << " " << entry.date << " " << entry.name << std::endl;
         }
+
         file.close();
     }
 }
@@ -131,8 +142,13 @@ void HighScore::draw() const {
 
     for (const auto& star : stars) {
         float twinkle = 0.7f + 0.3f * std::sin(t * 3 + star.first * 10);
-        int val = 150 + static_cast<int>(105 * twinkle);
-        al_draw_pixel(star.first, star.second, al_map_rgb(val, val, val + 30));
+        if (static_cast<int>(star.first + star.second) % 3 == 0) {
+            int blue = 150 + static_cast<int>(105 * twinkle);
+            al_draw_pixel(star.first, star.second, al_map_rgb(50, 100, blue));
+        } else {
+            int val = 150 + static_cast<int>(105 * twinkle);
+            al_draw_pixel(star.first, star.second, al_map_rgb(val, val, val + 30));
+        }
     }
 
     al_draw_text(font, al_map_rgb(100, 180, 255), width / 2, 50,
@@ -142,20 +158,30 @@ void HighScore::draw() const {
     int startY = 150;
     int lineHeight = 60;
 
-    for (size_t i = 0; i < topScores.size(); ++i) {
-        std::string rank = std::to_string(i + 1) + ".";
-        std::string name = topScores[i].name;
-        std::string scoreText = std::to_string(topScores[i].score);
+ for (size_t i = 0; i < topScores.size(); ++i) {
+    std::string rank = std::to_string(i + 1) + ".";
+    std::string scoreText = std::to_string(topScores[i].score);
+    std::string name = topScores[i].name;
 
-        int y = startY + i * lineHeight;
+    // Ranking
+    al_draw_text(font, al_map_rgb(255, 255, 255), 100, startY + i * lineHeight,
+                 ALLEGRO_ALIGN_LEFT, rank.c_str());
 
-        al_draw_text(font, al_map_rgb(255, 255, 255), 100, y, ALLEGRO_ALIGN_LEFT, rank.c_str());
-        al_draw_text(font, al_map_rgb(255, 100, 255), 160, y, ALLEGRO_ALIGN_LEFT, name.c_str());
-        al_draw_text(font, al_map_rgb(255, 255, 0), 400, y, ALLEGRO_ALIGN_LEFT, scoreText.c_str());
+    // Puntaje
+    al_draw_text(font, al_map_rgb(255, 255, 0), 200, startY + i * lineHeight,
+                 ALLEGRO_ALIGN_LEFT, scoreText.c_str());
+
+    // Nombre
+    al_draw_text(font, al_map_rgb(255, 100, 255), 400, startY + i * lineHeight,
+                 ALLEGRO_ALIGN_LEFT, name.c_str());
+}
+    if (topScores.empty()) {
+        al_draw_text(font, al_map_rgb(150, 150, 150), width / 2, 200,
+                     ALLEGRO_ALIGN_CENTER, "No scores yet!");
     }
 
     al_draw_text(font, al_map_rgb(100, 150, 200), width / 2, height - 50,
-                 ALLEGRO_ALIGN_CENTER, "Presiona ENTER o ESC para volver");
+                 ALLEGRO_ALIGN_CENTER, "Press ESC or ENTER to return");
 
     al_flip_display();
 }
