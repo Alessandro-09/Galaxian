@@ -53,28 +53,30 @@ int main() {
         int option = menu.run(sys);
 
         switch (option) {
-            case 0: {  // Start Game
-                InstructionsScreen instructions(sys.font, SCREEN_WIDTH, SCREEN_HEIGHT);
-                if (instructions.run(sys)) {
-                    // Detener todas las músicas antes de entrar al juego
-                    if (sys.menuMusic) al_set_audio_stream_playing(sys.menuMusic, false);
-                    if (sys.instructionsMusic) al_set_audio_stream_playing(sys.instructionsMusic, false);
-                    
-                    Game game(sys.font, SCREEN_WIDTH, SCREEN_HEIGHT);
-                    game.run(sys);
-                    
-                    // Guardar puntaje al terminar el juego
-                    int finalScore = game.getCurrentScore();
-                    if (finalScore > 0) {
-                        HighScore highScore(sys.font, SCREEN_WIDTH, SCREEN_HEIGHT);
-                        highScore.addScore(finalScore);
-                        std::cout << "Puntaje guardado: " << finalScore << std::endl;
-                    }
-                    
-                    // Reanudar solo la música del menú al volver
-                    if (sys.menuMusic) al_set_audio_stream_playing(sys.menuMusic, true);
-                }
-                break;
+case 0: {  // Start Game
+    InstructionsScreen instructions(sys.font, SCREEN_WIDTH, SCREEN_HEIGHT);
+    if (instructions.run(sys)) {
+        if (sys.menuMusic) al_set_audio_stream_playing(sys.menuMusic, false);
+        if (sys.instructionsMusic) al_set_audio_stream_playing(sys.instructionsMusic, false);
+
+        Game game(sys.font, SCREEN_WIDTH, SCREEN_HEIGHT);
+        game.run(sys);
+
+        int finalScore = game.getCurrentScore();
+
+        std::string playerName = "---";
+        GameOverScreen gameOver(sys.font, SCREEN_WIDTH, SCREEN_HEIGHT);
+        playerName = gameOver.show(sys, finalScore);
+
+        if (finalScore > 0 && playerName.length() == 3) {
+            HighScore highScore(sys.font, SCREEN_WIDTH, SCREEN_HEIGHT);
+            highScore.addScore(finalScore, playerName);
+            std::cout << "Puntaje guardado: " << finalScore << " (" << playerName << ")" << std::endl;
+        }
+
+        if (sys.menuMusic) al_set_audio_stream_playing(sys.menuMusic, true);
+    }
+    break;
             }
             case 1: {  // High Scores
                 HighScore highScore(sys.font, SCREEN_WIDTH, SCREEN_HEIGHT);
