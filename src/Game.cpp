@@ -861,6 +861,7 @@ void Game::update(SystemResources& sys) {
     {
         nivel++;
         crearnivel();
+	limpiarbalas();
         tiempoUltimoAtaque = al_get_time();
     }
     actualizarenemigos(sys);
@@ -1005,6 +1006,8 @@ int Game::run(SystemResources& sys) {
         {
             running=false;
             limpiarenemigos();
+	    limpiarbalas();
+            delete nave;
 
         }
         else if (event.type == ALLEGRO_EVENT_TIMER) {
