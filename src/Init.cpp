@@ -28,7 +28,7 @@ SystemResources initializeSystem(int width, int height, const char* fontPath, in
         return sys;
     }
 
-    // 3.1. Inicializar mixer de audiogit
+    // 3.1. Inicializar mixer de audio
     if (!al_reserve_samples(8)) {
         std::cerr << "Error al inicializar mixer de audio." << std::endl;
         return sys;
