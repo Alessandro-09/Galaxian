@@ -860,8 +860,8 @@ void Game::update(SystemResources& sys) {
     if(enemigos==nullptr)
     {
         nivel++;
+	limpiarbalas();
         crearnivel();
-        limpiarbalas();
         tiempoUltimoAtaque = al_get_time();
     }
     actualizarenemigos(sys);
