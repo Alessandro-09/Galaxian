@@ -1235,7 +1235,7 @@ int Game::run(SystemResources& sys) {
         if (event.type == ALLEGRO_EVENT_DISPLAY_CLOSE) {
             limpiarbalas();
             limpiarenemigos();
-            nivel=0;
+            nivel=1;
             running = false;
             
         } 
@@ -1243,7 +1243,7 @@ int Game::run(SystemResources& sys) {
             if (event.keyboard.keycode == ALLEGRO_KEY_ESCAPE) {
                 limpiarbalas();
                 limpiarenemigos();
-                nivel=0;
+                nivel=1;
                 running = false;
                 
             }
@@ -1262,7 +1262,7 @@ int Game::run(SystemResources& sys) {
         {
             limpiarbalas();
             limpiarenemigos();
-            nivel=0;
+            nivel=1;
             running=false;
             
         }
