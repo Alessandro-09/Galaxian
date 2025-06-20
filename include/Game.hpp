@@ -43,11 +43,15 @@ private:
     int currentScore;
     int highScore;
 
-    // Variables para Game Over y explosión
+    // Variables para Game Over y explosión - REORDENADAS
     bool gameOver;
     bool showExplosion;
     float explosionTimer;
     float gameOverTimer;
+    float starSpeed;
+    float speedMultiplier; 
+    float elapsedTime;  // MOVIDO DESPUÉS DE speedMultiplier
+    
     ALLEGRO_BITMAP* explosionImg;
     ALLEGRO_BITMAP* livesSprite;
 
@@ -61,9 +65,6 @@ private:
     void crearnave();
     void generateStars();
     void update(SystemResources& sys);
-    float starSpeed;
-    float speedMultiplier; 
-    float elapsedTime;  
 };
 
 #endif

@@ -95,27 +95,30 @@ void agregarBala(ptr_bala& lista, ptr_bala Nuevo)
 		lista = Nuevo;//Lista apunta al nuevo elemento
 	}
 }
-void limpiarenemigos() // se encarga de limpiar la cola de enemigos
-{
+void limpiarenemigos() {
     ptr_est aux = enemigos;
-    while (aux != nullptr)
-    {
+    while (aux != nullptr) {
         ptr_est temp = aux;
         aux = aux->Siguiente;
+        
+        // Liberar bitmap antes de eliminar el objeto
+        if (temp->bitmap) {
+            al_destroy_bitmap(temp->bitmap);
+        }
+        
         delete temp;
     }
-    enemigos = nullptr; // Importante para evitar punteros colgantes
+    enemigos = nullptr;
 }
-void limpiarbalas()
-{
+
+void limpiarbalas() {
     ptr_bala aux = Balas;
-    while (aux != nullptr)
-    {
+    while (aux != nullptr) {
         ptr_bala temp = aux;
         aux = aux->siguiente;
         delete temp;
     }
-    Balas = nullptr; // Importante para evitar punteros colgantes
+    Balas = nullptr;
 }
 
 
@@ -134,20 +137,25 @@ bool puedeAtacar(ptr_est e) {
 }
 
 Game::Game(ALLEGRO_FONT* font, int width, int height) 
-    : font(font), width(width), height(height), 
+    : font(font), smallFont(nullptr), width(width), height(height), 
       currentScore(0), highScore(0),
-      starSpeed(1.0f), speedMultiplier(1.0f), elapsedTime(0.0f) {
+      gameOver(false), showExplosion(false), explosionTimer(0.0f), 
+      gameOverTimer(0.0f), starSpeed(1.0f), speedMultiplier(1.0f), elapsedTime(0.0f),
+      explosionImg(nullptr), livesSprite(nullptr) {
 
+    // Inicializar variables globales a nullptr
+    Balas = nullptr;
+    enemigos = nullptr;
+    nave = nullptr;
+    
     // Crear fuente pequeña para puntajes 
     smallFont = al_load_ttf_font("assets/space_font.ttf", 18, 0);
     if (!smallFont) {
-    // Si no se puede cargar, usar la fuente normal
         smallFont = font;
     }
 
-    // Cargar sprite específico para las vidas (siempre nave1.png)
+    // Cargar sprite específico para las vidas
     livesSprite = al_load_bitmap("pictures/nave1.png");
-
 
     crearnivel();
     crearnave();
@@ -162,10 +170,23 @@ Game::Game(ALLEGRO_FONT* font, int width, int height)
 }
 
 Game::~Game() {
+    // Limpiar listas enlazadas
+    limpiarenemigos();
+    limpiarbalas();
+    
+    // Limpiar nave
+    if (nave) {
+        if (nave->bitmap) al_destroy_bitmap(nave->bitmap);
+        if (nave->disparobitmap) al_destroy_bitmap(nave->disparobitmap);
+        delete nave;
+        nave = nullptr;
+    }
+    
     // Liberar la fuente pequeña solo si es diferente de la principal
     if (smallFont && smallFont != font) {
         al_destroy_font(smallFont);
     }
+    
     // Liberar imagen de explosión
     if (explosionImg) {
         al_destroy_bitmap(explosionImg);
