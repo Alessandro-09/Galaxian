@@ -2,6 +2,7 @@
 #include "Menu.hpp"
 #include "Game.hpp"
 #include "InstructionsScreen.hpp"
+#include "GameOverScreen.hpp" 
 #include <allegro5/allegro_image.h>
 #include <iostream>
 #include "HighScore.hpp"
