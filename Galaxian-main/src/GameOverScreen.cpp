@@ -36,13 +36,13 @@ std::string GameOverScreen::show(SystemResources& sys, int score) {
 
         al_draw_text(font, al_map_rgb(255,0,0), screenWidth/2, screenHeight/4, ALLEGRO_ALIGN_CENTER, "GAME OVER");
         al_draw_text(font, al_map_rgb(255,255,255), screenWidth/2, screenHeight/4+60, ALLEGRO_ALIGN_CENTER, scoreText.c_str());
-        al_draw_text(font, al_map_rgb(180,180,180), screenWidth/2, screenHeight/2-20, ALLEGRO_ALIGN_CENTER, "Escribe tu nombre (3 letras):");
+        al_draw_text(font, al_map_rgb(180,180,180), screenWidth/2, screenHeight/2-20, ALLEGRO_ALIGN_CENTER, "Write your name (3 letters):");
         al_draw_text(font, al_map_rgb(255,255,0), screenWidth/2, screenHeight/2+30, ALLEGRO_ALIGN_CENTER, nameInput);
 
         if (charIndex < 3) {
-            al_draw_text(font, al_map_rgb(150,150,150), screenWidth/2, screenHeight-60, ALLEGRO_ALIGN_CENTER, "Escribe letras...");
+            al_draw_text(font, al_map_rgb(150,150,150), screenWidth/2, screenHeight-60, ALLEGRO_ALIGN_CENTER, "Write 3 letters");
         } else {
-            al_draw_text(font, al_map_rgb(100,255,100), screenWidth/2, screenHeight-60, ALLEGRO_ALIGN_CENTER, "ENTER para confirmar");
+            al_draw_text(font, al_map_rgb(100,255,100), screenWidth/2, screenHeight-60, ALLEGRO_ALIGN_CENTER, "ENTER to continue");
         }
 
         al_flip_display();
@@ -69,4 +69,4 @@ std::string GameOverScreen::show(SystemResources& sys, int score) {
     if (instance) al_destroy_sample_instance(instance);
     if (sample)   al_destroy_sample(sample);
     return result;
-}sss
+}
