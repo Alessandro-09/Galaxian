@@ -7,8 +7,8 @@
 #include <iostream>
 #include "HighScore.hpp"
 
-#define SCREEN_WIDTH 1280
-#define SCREEN_HEIGHT 720
+#define SCREEN_WIDTH 900
+#define SCREEN_HEIGHT 640
 #define FONT_PATH "assets/space_font.ttf"
 #define FONT_SIZE 36
 
